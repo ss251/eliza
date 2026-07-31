@@ -72,7 +72,7 @@ export default scenario({
 
   requires: {
     plugins: ["@elizaos/plugin-wallet"],
-    services: ["wallet-backend"],
+    services: ["token-info"],
   },
   isolation: "per-scenario",
 

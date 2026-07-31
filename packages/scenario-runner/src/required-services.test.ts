@@ -85,6 +85,13 @@ describe("scenario required-service contract", () => {
         requires: { services: ["wallet-backend", ""] },
       } as unknown as ScenarioDefinition),
     ).toThrow("invalid requires.services");
+    expect(() =>
+      scenario({
+        ...definition,
+        id: "misspelled-services",
+        requires: { service: ["wallet-backend"] },
+      } as unknown as ScenarioDefinition),
+    ).toThrow("unknown requires field(s): service");
   });
 });
 
@@ -123,7 +130,6 @@ describe("required-service readiness", () => {
     const preflight = waitForScenarioRequiredServices(
       runtime,
       scenarioWithServices("delayed", [DelayedService.serviceType]),
-      250,
     ).finally(() => {
       settled = true;
     });
@@ -161,13 +167,11 @@ describe("required-service readiness", () => {
     await waitForScenarioRequiredServices(
       runtime,
       scenarioWithServices("unrelated-a", []),
-      250,
     );
 
     const required = waitForScenarioRequiredServices(
       runtime,
       scenarioWithServices("required-b", [PreRegisteredService.serviceType]),
-      250,
     );
     startup.resolve(new PreRegisteredService(runtime));
     await expect(required).resolves.toEqual(
@@ -180,10 +184,11 @@ describe("required-service readiness", () => {
     );
   });
 
-  it("allows a failing optional sibling when another implementation is ready", async () => {
+  it("accepts a later plugin implementation when an earlier sibling fails", async () => {
     const runtime = await createRuntime();
     runtimes.push(runtime);
     const optionalCause = new Error("optional implementation unavailable");
+    let failingStarts = 0;
 
     class FailingOptionalService extends Service {
       static override serviceType = "scenario-sibling";
@@ -191,6 +196,7 @@ describe("required-service readiness", () => {
       capabilityDescription = "failing optional implementation";
 
       static override async start(): Promise<FailingOptionalService> {
+        failingStarts += 1;
         throw optionalCause;
       }
 
@@ -212,14 +218,18 @@ describe("required-service readiness", () => {
     }
 
     await runtime.registerPlugin({
-      name: "scenario-sibling-plugin",
-      description: "Registers alternative service implementations",
-      services: [FailingOptionalService, HealthyRequiredService],
+      name: "scenario-failing-sibling-plugin",
+      description: "Registers an unavailable implementation",
+      services: [FailingOptionalService],
+    });
+    await runtime.registerPlugin({
+      name: "scenario-healthy-sibling-plugin",
+      description: "Registers a later healthy implementation",
+      services: [HealthyRequiredService],
     });
     const services = await waitForScenarioRequiredServices(
       runtime,
       scenarioWithServices("sibling", [HealthyRequiredService.serviceType]),
-      250,
     );
 
     expect(services.get(HealthyRequiredService.serviceType)).toBeInstanceOf(
@@ -233,6 +243,10 @@ describe("required-service readiness", () => {
         expect.objectContaining({ message: optionalCause.message }),
       ]),
     );
+    await expect(
+      runtime.getServiceLoadPromise("scenario-sibling"),
+    ).resolves.toBeInstanceOf(HealthyRequiredService);
+    expect(failingStarts).toBe(1);
   });
 
   it("preserves the original startup cause in a typed preflight failure", async () => {
@@ -260,7 +274,6 @@ describe("required-service readiness", () => {
     const preflight = waitForScenarioRequiredServices(
       runtime,
       scenarioWithServices("failed", [NeverStartsService.serviceType]),
-      250,
     );
     startup.reject(startupCause);
 
@@ -314,14 +327,14 @@ describe("required-service readiness", () => {
     const definition = scenarioWithServices("retry", [
       RetryService.serviceType,
     ]);
-    const failed = waitForScenarioRequiredServices(runtime, definition, 250);
+    const failed = waitForScenarioRequiredServices(runtime, definition);
     firstAttempt.reject(new Error("transient startup failure"));
     await expect(failed).rejects.toBeInstanceOf(
       ScenarioRequiredServicePreflightError,
     );
 
     await expect(
-      waitForScenarioRequiredServices(runtime, definition, 250),
+      waitForScenarioRequiredServices(runtime, definition),
     ).resolves.toEqual(
       new Map([
         [RetryService.serviceType, expect.any(RetryService) as RetryService],
@@ -330,7 +343,7 @@ describe("required-service readiness", () => {
     expect(attempts).toBe(2);
   });
 
-  it("times out a never-settling start and fast teardown still completes", async () => {
+  it("lets the execution owner cancel a never-settling wait", async () => {
     const runtime = await createRuntime();
     runtimes.push(runtime);
 
@@ -351,16 +364,18 @@ describe("required-service readiness", () => {
       services: [HangingService],
     });
 
-    await expect(
-      waitForScenarioRequiredServices(
-        runtime,
-        scenarioWithServices("hanging", [HangingService.serviceType]),
-        20,
-      ),
-    ).rejects.toMatchObject({
+    const controller = new AbortController();
+    const preflight = waitForScenarioRequiredServices(
+      runtime,
+      scenarioWithServices("hanging", [HangingService.serviceType]),
+      controller.signal,
+    );
+    controller.abort(new Error("scenario runner stopped"));
+
+    await expect(preflight).rejects.toMatchObject({
       code: "SCENARIO_REQUIRED_SERVICE_PREFLIGHT_FAILED",
       cause: expect.objectContaining({
-        code: "SCENARIO_REQUIRED_SERVICE_TIMEOUT",
+        code: "SCENARIO_REQUIRED_SERVICE_ABORTED",
       }),
     });
     await stopWithin(runtime);
@@ -395,7 +410,6 @@ describe("required-service readiness", () => {
           scenarioWithServices("ordered-required", [
             OrderedService.serviceType,
           ]),
-          250,
         );
         startup.resolve(new OrderedService(runtime));
         await pending;
@@ -405,7 +419,6 @@ describe("required-service readiness", () => {
         await waitForScenarioRequiredServices(
           runtime,
           scenarioWithServices("ordered-optional", []),
-          250,
         );
         observations.push("optional-ready");
       };
@@ -431,7 +444,7 @@ describe("required-service readiness", () => {
     ]);
   });
 
-  it("keeps credentialless Birdeye optional while requiring wallet-backend", async () => {
+  it("keeps credentialless signing and Birdeye optional for token analytics", async () => {
     const runtime = await createRuntime();
     runtimes.push(runtime);
     const { default: walletPlugin } = (await import(
@@ -441,11 +454,10 @@ describe("required-service readiness", () => {
     await runtime.registerPlugin(walletPlugin);
     const services = await waitForScenarioRequiredServices(
       runtime,
-      scenarioWithServices("credentialless-wallet", ["wallet-backend"]),
-      2_000,
+      scenarioWithServices("credentialless-wallet", ["token-info"]),
     );
 
-    expect(services.get("wallet-backend")).toBeInstanceOf(Service);
+    expect(services.get("token-info")).toBeInstanceOf(Service);
     await expect(
       runtime.getServiceLoadPromise("birdeye"),
     ).rejects.toMatchObject({

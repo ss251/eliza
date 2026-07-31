@@ -73,7 +73,7 @@ export interface ExecutorOptions {
   providerName: string;
   minJudgeScore: number;
   turnTimeoutMs: number;
-  serviceStartTimeoutMs?: number;
+  abortSignal?: AbortSignal;
   executionProfile?: ScenarioExecutionProfile;
   runDir?: string;
 }
@@ -2445,11 +2445,7 @@ export async function runScenario(
       report.skipReason = `required plugin(s) not registered: ${missing.join(",")}`;
       return report;
     }
-    await waitForScenarioRequiredServices(
-      runtime,
-      scenario,
-      opts.serviceStartTimeoutMs,
-    );
+    await waitForScenarioRequiredServices(runtime, scenario, opts.abortSignal);
 
     // Re-attach interceptor so any actions registered by seed plugins are wrapped.
     interceptor.detach();

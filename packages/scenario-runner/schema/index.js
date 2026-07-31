@@ -287,9 +287,21 @@ function validateScenarioRequirements(value) {
   if (requires === undefined) {
     return;
   }
-  if (requires === null || typeof requires !== "object") {
+  if (
+    requires === null ||
+    typeof requires !== "object" ||
+    Array.isArray(requires)
+  ) {
     throw new Error(
       `scenario "${value?.id ?? "<unknown>"}" has invalid requires; expected { plugins?: string[], services?: string[] }`,
+    );
+  }
+  const unknownKeys = Object.keys(requires).filter(
+    (key) => key !== "plugins" && key !== "services",
+  );
+  if (unknownKeys.length > 0) {
+    throw new Error(
+      `scenario "${value?.id ?? "<unknown>"}" has unknown requires field(s): ${unknownKeys.join(", ")}`,
     );
   }
   for (const key of ["plugins", "services"]) {
