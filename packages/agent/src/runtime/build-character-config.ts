@@ -26,6 +26,7 @@ import {
   applyAdvancedCapabilitySettings,
   resolveAdvancedCapabilitiesEnabled,
 } from "./advanced-capabilities-config.ts";
+import { projectConnectorSettings } from "./project-connector-settings.ts";
 
 /**
  * Build a Character object from the runtime ElizaConfig.
@@ -269,10 +270,13 @@ export function buildCharacterFromConfig(config: ElizaConfig): Character {
     capabilityHints.length > 0
       ? `${systemPrompt}\n\n${capabilityHints.join("\n")}`
       : systemPrompt;
-  const mergedSettings = {
-    ...(agentEntry?.settings ?? {}),
-    ...settings,
-  };
+  const mergedSettings = projectConnectorSettings(
+    {
+      ...(agentEntry?.settings ?? {}),
+      ...settings,
+    },
+    config.connectors,
+  );
 
   return mergeCharacterDefaults({
     name,
