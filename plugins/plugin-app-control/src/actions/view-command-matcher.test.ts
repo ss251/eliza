@@ -39,10 +39,6 @@ describe("matchViewCommand — explicit user examples", () => {
 		["show my knowledge hub", "documents"],
 		["switch to focus mode", "focus"],
 		["open my goals", "goals"],
-		["open cloud apps", "cloud-apps"],
-		["show my deployed apps", "cloud-apps"],
-		["go to app deployments", "cloud-apps"],
-		["open plugins", "plugins-page"],
 		// coding cockpit — wins over task-coordinator's bare "coding"
 		["open the cockpit", "cockpit"],
 		["open coding cockpit", "cockpit"],
@@ -86,11 +82,6 @@ describe("matchViewCommand — multilingual", () => {
 		["mở cài đặt", "settings"],
 		// tl
 		["buksan ang settings", "settings"],
-		["abre aplicaciones en la nube", "cloud-apps"],
-		["ouvre les applications cloud", "cloud-apps"],
-		["打开云应用", "cloud-apps"],
-		["クラウドアプリを開いて", "cloud-apps"],
-		["클라우드 앱 열어", "cloud-apps"],
 	];
 	for (const [text, view] of cases) {
 		it(`"${text}" → ${view}`, () => {
@@ -120,6 +111,53 @@ describe("matchViewCommand — localized Knowledge labels", () => {
 	);
 });
 
+describe("matchViewCommand — Cloud Apps navigation arbitration", () => {
+	const commands = [
+		"open cloud apps",
+		"please navigate to the cloud applications",
+		"go to my deployed apps",
+		"abre las aplicaciones en la nube",
+		"abra aplicativos na nuvem",
+		"ouvre les applications cloud",
+		"öffne cloud-anwendungen",
+		"打开云应用",
+		"クラウドアプリを開いて",
+		"클라우드 앱 열어",
+		"mở ứng dụng đám mây",
+	] as const;
+
+	it.each(commands)("%j opens the Cloud Apps studio", (text) => {
+		expect(matchViewCommand(text)).toBe("cloud-apps");
+	});
+
+	const inventoryOrNonNavigation = [
+		"cloud apps",
+		"my cloud apps",
+		"list my cloud apps",
+		"show my cloud apps",
+		"list my deployed apps",
+		"what cloud apps do I have?",
+		"do not open cloud apps",
+		"don't open cloud apps",
+		"how do I open cloud apps?",
+		"tell me how to open cloud apps",
+		"if I open cloud apps, will I be charged?",
+		"when I open cloud apps it crashes",
+		"help me open cloud apps",
+		"open cloud apps documentation",
+		"open the cloud app Acme",
+		"abre la documentación de aplicaciones en la nube",
+		"云应用怎么打开",
+	] as const;
+
+	it.each(inventoryOrNonNavigation)(
+		"%j stays in normal action planning",
+		(text) => {
+			expect(matchViewCommand(text)).toBeNull();
+		},
+	);
+});
+
 describe("matchViewCommand — generated verb×view coverage (English)", () => {
 	const verbs = [
 		"open",
@@ -130,6 +168,7 @@ describe("matchViewCommand — generated verb×view coverage (English)", () => {
 		"switch to",
 	];
 	for (const viewId of MATCHER_VIEW_IDS) {
+		if (viewId === "cloud-apps") continue;
 		// Use the first English-ish noun (index 0 is the canonical English term).
 		const noun = __matcherData.VIEW_NOUNS[viewId][0];
 		for (const verb of verbs) {
@@ -148,9 +187,6 @@ describe("matchViewCommand — precision (must NOT match)", () => {
 		"thanks, that was helpful",
 		"can you summarize this article",
 		"i love using this app",
-		"open apps",
-		"open my apps",
-		"open applications",
 		"showcase knowledge",
 		"open knowledgebase",
 		"open knowledgeable",
