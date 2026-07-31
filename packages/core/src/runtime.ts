@@ -3703,9 +3703,20 @@ export class AgentRuntime implements IAgentRuntime {
 		worldPolicy?: ToolPolicyConfig;
 		roomPolicy?: ToolPolicyConfig;
 	}): Promise<Action[]> {
-		const policyService = (await this._ensureServiceStarted(
-			"tool_policy",
-		)) as ToolPolicyService | null;
+		let policyService: ToolPolicyService | null;
+		try {
+			policyService = (await this._ensureServiceStarted(
+				"tool_policy",
+			)) as ToolPolicyService | null;
+		} catch (error) {
+			// error-policy:J4 explicit user-facing degrade — a tool_policy service
+			// that fails to start must not block the turn; the designed no-policy
+			// behavior is "all actions allowed". Surfaced via reportError.
+			this.reportError("AgentRuntime.getFilteredActions", error, {
+				serviceType: "tool_policy",
+			});
+			policyService = null;
+		}
 
 		if (!policyService || !context) {
 			return [...this.actions];
@@ -3732,9 +3743,20 @@ export class AgentRuntime implements IAgentRuntime {
 			roomPolicy?: ToolPolicyConfig;
 		},
 	): Promise<{ allowed: boolean; reason: string }> {
-		const policyService = (await this._ensureServiceStarted(
-			"tool_policy",
-		)) as ToolPolicyService | null;
+		let policyService: ToolPolicyService | null;
+		try {
+			policyService = (await this._ensureServiceStarted(
+				"tool_policy",
+			)) as ToolPolicyService | null;
+		} catch (error) {
+			// error-policy:J4 explicit user-facing degrade — a tool_policy service
+			// that fails to start must not block the turn; the designed no-policy
+			// behavior is "all actions allowed". Surfaced via reportError.
+			this.reportError("AgentRuntime.isActionAllowed", error, {
+				serviceType: "tool_policy",
+			});
+			policyService = null;
+		}
 
 		if (!policyService) {
 			return { allowed: true, reason: "No policy service available" };
@@ -4535,9 +4557,20 @@ export class AgentRuntime implements IAgentRuntime {
 		);
 
 		// Optional trajectory logging service; absent unless configured.
-		const trajLogger = (await this._ensureServiceStarted("trajectories")) as
-			| (Service & TrajectoryProviderAccessLogger)
-			| null;
+		let trajLogger: (Service & TrajectoryProviderAccessLogger) | null;
+		try {
+			trajLogger = (await this._ensureServiceStarted("trajectories")) as
+				| (Service & TrajectoryProviderAccessLogger)
+				| null;
+		} catch (error) {
+			// error-policy:J7 diagnostics-must-not-kill-the-loop — a trajectory
+			// logger that fails to start must never abort composeState; continue
+			// without provider-access logging. Surfaced via reportError.
+			this.reportError("AgentRuntime.composeState.trajectories", error, {
+				serviceType: "trajectories",
+			});
+			trajLogger = null;
+		}
 		const composeStartedAt = Date.now();
 		const providerSignal =
 			this.turnControllers.signalFor(message.roomId) ??
@@ -5022,6 +5055,12 @@ export class AgentRuntime implements IAgentRuntime {
 		if (this.stopped) return null;
 		if (!this.isNativeFeatureServiceEnabled(serviceType)) return null;
 		const key = this.resolveServiceTypeAlias(serviceType) as ServiceTypeName;
+		// Fast path: a service that is already registered and running is returned
+		// immediately WITHOUT awaiting initPromise. Callers inside initialize()
+		// (plugin init -> getFilteredActions) would otherwise deadlock on the
+		// still-unresolved init barrier even though the instance is already up.
+		const alreadyRunning = this.services.get(key)?.[0];
+		if (alreadyRunning) return alreadyRunning;
 		await this.initPromise;
 		if (this.stopped) return null;
 		const classes = this.serviceTypes.get(key);

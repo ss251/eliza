@@ -5,7 +5,9 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { nativeRuntimeFeaturePluginNames } from "../plugins/native-features";
 import { AgentRuntime } from "../runtime";
+import type { Memory, Provider, ServiceTypeName, UUID } from "../types";
 import { Service } from "../types/service";
 
 function deferred<T>() {
@@ -101,6 +103,160 @@ describe("AgentRuntime service startup", () => {
 			expect(runtime.getServicesByType(FirstService.serviceType)).toEqual([
 				second,
 			]);
+		} finally {
+			await runtime.stop({ fast: true });
+		}
+	});
+
+	it("degrades tool-policy callers to the permissive default when the service fails to start", async () => {
+		const runtime = new AgentRuntime({ logLevel: "fatal" });
+		await runtime.initialize({ allowNoDatabase: true, skipMigrations: true });
+
+		class FailingPolicyService extends Service {
+			static override serviceType = "tool_policy";
+			capabilityDescription = "always fails to start";
+
+			static override async start(): Promise<FailingPolicyService> {
+				throw new Error("policy start boom");
+			}
+
+			override async stop(): Promise<void> {}
+		}
+
+		try {
+			await runtime.registerPlugin({
+				name: "failing-policy",
+				description: "Registers a tool_policy service whose start throws",
+				services: [FailingPolicyService],
+			});
+
+			const actions = await runtime.getFilteredActions({});
+			expect(actions).toEqual(runtime.getAllActions());
+
+			const verdict = await runtime.isActionAllowed("ANY_ACTION");
+			expect(verdict).toEqual({
+				allowed: true,
+				reason: "No policy service available",
+			});
+
+			const scopes = runtime
+				.getRecentReportedErrors()
+				.map((entry) => entry.scope);
+			expect(scopes).toContain("AgentRuntime.getFilteredActions");
+			expect(scopes).toContain("AgentRuntime.isActionAllowed");
+		} finally {
+			await runtime.stop({ fast: true });
+		}
+	});
+
+	it("completes composeState when the trajectories service fails to start", async () => {
+		const runtime = new AgentRuntime({
+			logLevel: "fatal",
+			enableTrajectories: false,
+		});
+		await runtime.initialize({ allowNoDatabase: true, skipMigrations: true });
+
+		class FailingTrajectoriesService extends Service {
+			static override serviceType = "trajectories";
+			capabilityDescription = "always fails to start";
+
+			static override async start(): Promise<FailingTrajectoriesService> {
+				throw new Error("trajectory logger boom");
+			}
+
+			override async stop(): Promise<void> {}
+		}
+
+		try {
+			// The plugin borrows the native trajectories plugin name so the
+			// feature gate reads enabled while the only implementation fails.
+			await runtime.registerPlugin({
+				name: nativeRuntimeFeaturePluginNames.trajectories,
+				description: "Registers a trajectories service whose start throws",
+				services: [FailingTrajectoriesService],
+			});
+
+			const probe: Provider = {
+				name: "PROBE",
+				get: async () => ({ text: "probe-ran", values: {}, data: {} }),
+			};
+			runtime.registerProvider(probe);
+
+			const message: Memory = {
+				id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" as UUID,
+				entityId: "22222222-2222-2222-2222-222222222222" as UUID,
+				roomId: "11111111-1111-1111-1111-111111111111" as UUID,
+				content: { text: "gm" },
+			};
+			const state = await runtime.composeState(message, ["PROBE"], true);
+			expect(state.text).toContain("probe-ran");
+
+			const scopes = runtime
+				.getRecentReportedErrors()
+				.map((entry) => entry.scope);
+			expect(scopes).toContain("AgentRuntime.composeState.trajectories");
+		} finally {
+			await runtime.stop({ fast: true });
+		}
+	});
+
+	it("serves an already-started instance during initialize without awaiting the init barrier", async () => {
+		class StartedPolicyService extends Service {
+			static override serviceType = "tool_policy";
+			capabilityDescription = "already-running policy stand-in";
+
+			override async stop(): Promise<void> {}
+
+			isToolAllowed(): { allowed: boolean; reason: string } {
+				return { allowed: true, reason: "stub policy" };
+			}
+		}
+
+		const verdictDuringInit =
+			deferred<Awaited<ReturnType<AgentRuntime["isActionAllowed"]>>>();
+		const runtime = new AgentRuntime({
+			logLevel: "fatal",
+			plugins: [
+				{
+					name: "init-gate",
+					description:
+						"Exercises the tool-policy path while initialize() is still running",
+					init: async () => {
+						// The instance is already up before the init barrier resolves;
+						// the lookup must take the fast path instead of deadlocking on
+						// initPromise (which this very init call is blocking).
+						runtime.services.set("tool_policy" as ServiceTypeName, [
+							new StartedPolicyService(runtime),
+						]);
+						verdictDuringInit.resolve(
+							await runtime.isActionAllowed("ANY_ACTION"),
+						);
+					},
+				},
+			],
+		});
+
+		try {
+			const init = runtime.initialize({
+				allowNoDatabase: true,
+				skipMigrations: true,
+			});
+			const verdict = await Promise.race([
+				verdictDuringInit.promise,
+				new Promise<never>((_, reject) =>
+					setTimeout(
+						() =>
+							reject(
+								new Error(
+									"isActionAllowed deadlocked on the init barrier during initialize()",
+								),
+							),
+						5_000,
+					),
+				),
+			]);
+			expect(verdict).toEqual({ allowed: true, reason: "stub policy" });
+			await init;
 		} finally {
 			await runtime.stop({ fast: true });
 		}
