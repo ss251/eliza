@@ -1,0 +1,2814 @@
+[
+ {
+  "key": "accounts.add.chooseDescription",
+  "value": "Choose the provider you want to connect. Chat providers use API keys; coding subscriptions use first-party login or dedicated plan credentials."
+ },
+ {
+  "key": "accounts.add.chooseTitle",
+  "value": "Add a provider account"
+ },
+ {
+  "key": "accounts.add.enterHint",
+  "value": "\\u21b5"
+ },
+ {
+  "key": "accounts.add.noMatch",
+  "value": "No providers match your search."
+ },
+ {
+  "key": "accounts.add.search",
+  "value": "Search providers"
+ },
+ {
+  "key": "accounts.available.all",
+  "value": "All providers (${availableOptions.length})"
+ },
+ {
+  "key": "accounts.available.more",
+  "value": "More providers (${availableOptions.length})"
+ },
+ {
+  "key": "accounts.connect.currentCount",
+  "value": "${count} connected"
+ },
+ {
+  "key": "accounts.connect.heading",
+  "value": "Add another account"
+ },
+ {
+  "key": "accounts.connect.loadingCount",
+  "value": "Loading accounts…"
+ },
+ {
+  "key": "accounts.connect.subheading",
+  "value": "Pick a provider to sign into another account. Your accounts rotate automatically."
+ },
+ {
+  "key": "accounts.empty.cta",
+  "value": "Connect your first account"
+ },
+ {
+  "key": "accounts.empty.description",
+  "value": "Connect an API key for chat, or sign in to a coding subscription to power task agents. Add several to any provider and they'll rotate automatically."
+ },
+ {
+  "key": "accounts.empty.title",
+  "value": "No accounts connected yet"
+ },
+ {
+  "key": "accounts.error.load",
+  "value": "Couldn't load your accounts."
+ },
+ {
+  "key": "accounts.error.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "accounts.management.summary",
+  "value": "Provider accounts feed chat and coding agents. Chat defaults are chosen in Intelligence above; here you manage the accounts behind them."
+ },
+ {
+  "key": "accounts.reauthenticate",
+  "value": "Reauthenticate"
+ },
+ {
+  "key": "accounts.reauthenticate.description",
+  "value": "Sign in again with the same provider. Your current credential stays active until the new sign-in succeeds, then this account is updated in place."
+ },
+ {
+  "key": "accounts.reauthenticate.title",
+  "value": "Reauthenticate ${credentialRepairAccount.label}"
+ },
+ {
+  "key": "accounts.replaceCredential",
+  "value": "Replace credential"
+ },
+ {
+  "key": "accounts.replaceCredential.description",
+  "value": "Enter a new credential for the same provider. The current credential stays unchanged until the replacement is verified and saved."
+ },
+ {
+  "key": "accounts.replaceCredential.save",
+  "value": "Save replacement"
+ },
+ {
+  "key": "accounts.replaceCredential.title",
+  "value": "Replace credential for ${credentialRepairAccount.label}"
+ },
+ {
+  "key": "accounts.row.accountsLabel",
+  "value": "Accounts in pool"
+ },
+ {
+  "key": "accounts.row.activeAccount",
+  "value": "Next in rotation"
+ },
+ {
+  "key": "accounts.row.activeReason",
+  "value": "active · ${\n                      SELECTION_REASON_LABEL[selection.reason]\n                    }"
+ },
+ {
+  "key": "accounts.row.activeResetIn",
+  "value": " · resets in ${activeResetIn}"
+ },
+ {
+  "key": "accounts.row.addAnother",
+  "value": "Add"
+ },
+ {
+  "key": "accounts.row.attention",
+  "value": "Needs attention"
+ },
+ {
+  "key": "accounts.row.chatActive",
+  "value": "Chat"
+ },
+ {
+  "key": "accounts.row.codingActive",
+  "value": "Coding"
+ },
+ {
+  "key": "accounts.row.connect",
+  "value": "Connect"
+ },
+ {
+  "key": "accounts.row.healthy",
+  "value": "${healthy}/${sorted.length} healthy"
+ },
+ {
+  "key": "accounts.row.selectionTooltip",
+  "value": "The pool serves this account next. Reset-soonest spends the budget that refunds first."
+ },
+ {
+  "key": "accounts.row.useForChat",
+  "value": "Use for chat"
+ },
+ {
+  "key": "accounts.row.useForChat.tooltip",
+  "value": "Route chat through this provider account pool"
+ },
+ {
+  "key": "accounts.row.useForCoding",
+  "value": "Use for coding"
+ },
+ {
+  "key": "accounts.row.useForCoding.tooltip",
+  "value": "Route coding agents through this subscription"
+ },
+ {
+  "key": "accounts.table.activeAccount",
+  "value": "Next in rotation"
+ },
+ {
+  "key": "accounts.table.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "accounts.table.col.account",
+  "value": "Account"
+ },
+ {
+  "key": "accounts.table.col.actions",
+  "value": "Actions"
+ },
+ {
+  "key": "accounts.table.col.enabled",
+  "value": "Enabled"
+ },
+ {
+  "key": "accounts.table.col.health",
+  "value": "Health"
+ },
+ {
+  "key": "accounts.table.col.lastUsed",
+  "value": "Last used"
+ },
+ {
+  "key": "accounts.table.col.leases",
+  "value": "Leases"
+ },
+ {
+  "key": "accounts.table.col.priority",
+  "value": "Priority"
+ },
+ {
+  "key": "accounts.table.col.resets",
+  "value": "Resets"
+ },
+ {
+  "key": "accounts.table.col.usage",
+  "value": "Usage"
+ },
+ {
+  "key": "accounts.table.delete.confirm",
+  "value": "Remove account"
+ },
+ {
+  "key": "accounts.table.deleteConfirm.description",
+  "value": "Removing the account deletes its stored credential and pool metadata. This cannot be undone."
+ },
+ {
+  "key": "accounts.table.deleteConfirm.title",
+  "value": "Remove this account?"
+ },
+ {
+  "key": "accounts.table.empty",
+  "value": "No accounts in this pool yet."
+ },
+ {
+  "key": "accounts.table.enabledToggle",
+  "value": "Toggle ${account.label}"
+ },
+ {
+  "key": "accounts.table.leases.servedLast",
+  "value": "served last"
+ },
+ {
+  "key": "accounts.table.leases.tooltip",
+  "value": "Active leases checked out now"
+ },
+ {
+  "key": "accounts.table.loading",
+  "value": "Loading accounts…"
+ },
+ {
+  "key": "accounts.table.moveDown",
+  "value": "Lower priority of ${account.label}"
+ },
+ {
+  "key": "accounts.table.moveDown.tooltip",
+  "value": "Lower priority"
+ },
+ {
+  "key": "accounts.table.moveUp",
+  "value": "Raise priority of ${account.label}"
+ },
+ {
+  "key": "accounts.table.moveUp.tooltip",
+  "value": "Raise priority"
+ },
+ {
+  "key": "accounts.table.priority.tooltip",
+  "value": "Lower value runs first"
+ },
+ {
+  "key": "accounts.table.reauth",
+  "value": "Reauth"
+ },
+ {
+  "key": "accounts.table.refresh",
+  "value": "Refresh usage for ${account.label}"
+ },
+ {
+  "key": "accounts.table.refresh.tooltip",
+  "value": "Refresh usage"
+ },
+ {
+  "key": "accounts.table.remove",
+  "value": "Remove ${account.label}"
+ },
+ {
+  "key": "accounts.table.rename",
+  "value": "Rename account"
+ },
+ {
+  "key": "accounts.table.renameInput",
+  "value": "Rename ${account.label}"
+ },
+ {
+  "key": "accounts.table.replace",
+  "value": "Replace"
+ },
+ {
+  "key": "accounts.table.resetsIn",
+  "value": "resets in ${countdown}"
+ },
+ {
+  "key": "accounts.table.test",
+  "value": "Test"
+ },
+ {
+  "key": "accounts.table.usage.notApplicable",
+  "value": "Not reported"
+ },
+ {
+  "key": "accounts.table.usage.session",
+  "value": "5h"
+ },
+ {
+  "key": "accounts.table.usage.weekly",
+  "value": "7d"
+ },
+ {
+  "key": "agentorchestrator.accounts",
+  "value": "Coding accounts"
+ },
+ {
+  "key": "agentorchestrator.activeAgents",
+  "value": "{{count}} active"
+ },
+ {
+  "key": "agentorchestrator.activeAgentsTotal",
+  "value": "{{count}} active across {{rooms}} rooms"
+ },
+ {
+  "key": "agentorchestrator.activeShort",
+  "value": "{{count}} live"
+ },
+ {
+  "key": "agentorchestrator.availabilityHint",
+  "value": "{{healthy}} healthy of {{enabled}} enabled"
+ },
+ {
+  "key": "agentorchestrator.connectAccounts",
+  "value": "Connect"
+ },
+ {
+  "key": "agentorchestrator.inUse",
+  "value": "{{count}} active"
+ },
+ {
+  "key": "agentorchestrator.live",
+  "value": "live"
+ },
+ {
+  "key": "agentorchestrator.multiParty",
+  "value": "{{count}} agents"
+ },
+ {
+  "key": "agentorchestrator.multiPartyRoom",
+  "value": "Multi-party room"
+ },
+ {
+  "key": "agentorchestrator.noAccounts",
+  "value": "No coding subscriptions connected."
+ },
+ {
+  "key": "agentorchestrator.noAccountsHint",
+  "value": "Add Claude / Codex / z.ai accounts in Settings to round-robin sub-agents."
+ },
+ {
+  "key": "agentorchestrator.noRooms",
+  "value": "No active task rooms."
+ },
+ {
+  "key": "agentorchestrator.noRoomsHint",
+  "value": "Sub-agents spawned for a coding task appear here as a live swarm."
+ },
+ {
+  "key": "agentorchestrator.noTasks",
+  "value": "No orchestration tasks yet"
+ },
+ {
+  "key": "agentorchestrator.noTasksDescription",
+  "value": "New coding tasks will appear here as they run."
+ },
+ {
+  "key": "agentorchestrator.openSession",
+  "value": "Open session"
+ },
+ {
+  "key": "agentorchestrator.openTasks",
+  "value": "Open tasks"
+ },
+ {
+  "key": "agentorchestrator.rooms",
+  "value": "Task rooms"
+ },
+ {
+  "key": "agentorchestrator.runningTool",
+  "value": "{{tool}}"
+ },
+ {
+  "key": "agentorchestrator.session",
+  "value": "5h"
+ },
+ {
+  "key": "agentorchestrator.statusDone",
+  "value": "done"
+ },
+ {
+  "key": "agentorchestrator.statusIdle",
+  "value": "idle"
+ },
+ {
+  "key": "agentorchestrator.statusReady",
+  "value": "ready"
+ },
+ {
+  "key": "agentorchestrator.statusToolRunning",
+  "value": "running tool"
+ },
+ {
+  "key": "agentorchestrator.statusWorking",
+  "value": "working"
+ },
+ {
+  "key": "agentorchestrator.strategy",
+  "value": "Strategy"
+ },
+ {
+  "key": "agentorchestrator.taskRooms",
+  "value": "Task rooms"
+ },
+ {
+  "key": "agentorchestrator.tasks",
+  "value": "Projects"
+ },
+ {
+  "key": "agentorchestrator.weekly",
+  "value": "7d"
+ },
+ {
+  "key": "automationsfeed.addAutomation",
+  "value": "Add automation"
+ },
+ {
+  "key": "automationsfeed.newAutomation",
+  "value": "New automation"
+ },
+ {
+  "key": "automationsfeed.runWorkflowNow",
+  "value": "Run {{name}} now"
+ },
+ {
+  "key": "automationsfeed.statActive",
+  "value": "Active"
+ },
+ {
+  "key": "automationsfeed.statFailed",
+  "value": "Failed"
+ },
+ {
+  "key": "automationsfeed.statPassed",
+  "value": "Passed"
+ },
+ {
+  "key": "automationsfeed.statTotal",
+  "value": "Total"
+ },
+ {
+  "key": "browserworkspace.CloseAllTabs",
+  "value": "Close all tabs"
+ },
+ {
+  "key": "browserworkspace.NoActiveTab",
+  "value": "No tab"
+ },
+ {
+  "key": "browserworkspace.NoTabsYet",
+  "value": "No tabs open yet"
+ },
+ {
+  "key": "browserworkspace.OpenTabSwitcher",
+  "value": "Show {{count}} tabs"
+ },
+ {
+  "key": "browserworkspace.OpenWebsite",
+  "value": "Open a website"
+ },
+ {
+  "key": "camera.capture",
+  "value": "Take photo"
+ },
+ {
+  "key": "camera.capturedAlt",
+  "value": "Captured photo"
+ },
+ {
+  "key": "camera.denied",
+  "value": "Enable camera access for {{appName}}, then return here to start the preview."
+ },
+ {
+  "key": "camera.deniedTitle",
+  "value": "Camera access is off"
+ },
+ {
+  "key": "camera.openSettings",
+  "value": "Open Settings"
+ },
+ {
+  "key": "camera.retake",
+  "value": "Retake"
+ },
+ {
+  "key": "camera.retry",
+  "value": "Try again"
+ },
+ {
+  "key": "camera.switch",
+  "value": "Switch camera"
+ },
+ {
+  "key": "camera.unavailable",
+  "value": "The camera is unavailable on this device."
+ },
+ {
+  "key": "capabilities.cloud.apiBaseLabel",
+  "value": "Cloud API base URL"
+ },
+ {
+  "key": "capabilities.cloud.bioLabel",
+  "value": "Sandbox bio"
+ },
+ {
+  "key": "capabilities.cloud.nameLabel",
+  "value": "Sandbox name"
+ },
+ {
+  "key": "capabilities.cloud.tokenLabel",
+  "value": "Cloud auth token"
+ },
+ {
+  "key": "capabilities.connectionModeLabel",
+  "value": "Connection"
+ },
+ {
+  "key": "capabilities.endpoint.idLabel",
+  "value": "Endpoint ID"
+ },
+ {
+  "key": "capabilities.endpoint.modulesLabel",
+  "value": "Allowed module IDs"
+ },
+ {
+  "key": "capabilities.endpoint.tokenLabel",
+  "value": "Bearer token"
+ },
+ {
+  "key": "capabilities.endpoint.urlLabel",
+  "value": "Endpoint URL"
+ },
+ {
+  "key": "capabilities.status.error",
+  "value": "Error"
+ },
+ {
+  "key": "chat.cancelReply",
+  "value": "Cancel reply"
+ },
+ {
+  "key": "chat.replyingTo",
+  "value": "Replying to"
+ },
+ {
+  "key": "chatsurface.assistant",
+  "value": "{{appName}}"
+ },
+ {
+  "key": "chatsurface.vision",
+  "value": "Show {{appName}} my screen"
+ },
+ {
+  "key": "chatview.ImageReadFailed",
+  "value": "Couldn't read image: {{message}}"
+ },
+ {
+  "key": "cloud.account.securityLink",
+  "value": "Sessions & security"
+ },
+ {
+  "key": "cloud.account.securityLinkDesc",
+  "value": "Active sessions, privacy, and audit log."
+ },
+ {
+  "key": "cloud.admin.gate.signInBody",
+  "value": "Sign in to access the admin surfaces."
+ },
+ {
+  "key": "cloud.admin.gate.signInCta",
+  "value": "Sign in"
+ },
+ {
+  "key": "cloud.admin.gate.signInTitle",
+  "value": "Sign in required"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.checkedAt",
+  "value": "Checked at"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.configured",
+  "value": "configured"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.keyConfigured",
+  "value": "key configured"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.loadFailed",
+  "value": "Failed to load RPC status"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.metaTitle",
+  "value": "Admin: RPC Status · Eliza Cloud"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.missing",
+  "value": "missing"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.noKey",
+  "value": "no key"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.probing",
+  "value": "Probing RPCs…"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.publicRpcWarning",
+  "value": "Using chain's public RPC — set a dedicated provider URL for production."
+ },
+ {
+  "key": "cloud.admin.rpcStatus.refresh",
+  "value": "Refresh"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.subtitle",
+  "value": "Live probe of each chain's RPC + ELIZA token balance on the treasury hot wallet."
+ },
+ {
+  "key": "cloud.admin.rpcStatus.title",
+  "value": "RPC Status"
+ },
+ {
+  "key": "cloud.admin.rpcStatus.treasuryWallet",
+  "value": "Treasury hot wallet"
+ },
+ {
+  "key": "cloud.agentCard.openAgent",
+  "value": "Open agent"
+ },
+ {
+  "key": "cloud.agents.detail.publicUrl",
+  "value": "Public URL"
+ },
+ {
+  "key": "cloud.agents.loadFailed",
+  "value": "Failed to load agents"
+ },
+ {
+  "key": "cloud.apiKeys.signInRequired",
+  "value": "Sign in to manage API keys."
+ },
+ {
+  "key": "cloud.appDomains.buyAction",
+  "value": "Buy {{price}}"
+ },
+ {
+  "key": "cloud.appDomains.buyAddCredits",
+  "value": "Add credits"
+ },
+ {
+  "key": "cloud.appDomains.buyCheck",
+  "value": "Check"
+ },
+ {
+  "key": "cloud.appDomains.buyCheckFailed",
+  "value": "Could not check that domain. Try again."
+ },
+ {
+  "key": "cloud.appDomains.buyConfirmAction",
+  "value": "Buy domain"
+ },
+ {
+  "key": "cloud.appDomains.buyConfirmBody",
+  "value": "{{price}} will be charged from your credit balance now. The domain renews automatically each year at {{renewal}} unless you cancel."
+ },
+ {
+  "key": "cloud.appDomains.buyConfirmTitle",
+  "value": "Buy {{domain}}?"
+ },
+ {
+  "key": "cloud.appDomains.buyFailed",
+  "value": "Purchase failed. You were not charged."
+ },
+ {
+  "key": "cloud.appDomains.buyInputLabel",
+  "value": "Domain to buy"
+ },
+ {
+  "key": "cloud.appDomains.buyInsufficient",
+  "value": "Not enough credits to buy this domain."
+ },
+ {
+  "key": "cloud.appDomains.buyLive",
+  "value": "Connecting it to your app now."
+ },
+ {
+  "key": "cloud.appDomains.buyPlaceholder",
+  "value": "yourbrand.com"
+ },
+ {
+  "key": "cloud.appDomains.buyPriceLine",
+  "value": "{{price}}/yr"
+ },
+ {
+  "key": "cloud.appDomains.buyProvisioning",
+  "value": "Setting up DNS — it may take a few minutes to go live."
+ },
+ {
+  "key": "cloud.appDomains.buyRenewsLine",
+  "value": "renews {{price}}/yr"
+ },
+ {
+  "key": "cloud.appDomains.buySubtitle",
+  "value": "Register a new domain through Cloudflare and connect it to this app."
+ },
+ {
+  "key": "cloud.appDomains.buySuccess",
+  "value": "Domain purchased"
+ },
+ {
+  "key": "cloud.appDomains.buyTaken",
+  "value": "{{domain}} is not available."
+ },
+ {
+  "key": "cloud.appDomains.buyTitle",
+  "value": "Buy a Domain"
+ },
+ {
+  "key": "cloud.appDomains.buyUnavailable",
+  "value": "That domain is no longer available."
+ },
+ {
+  "key": "cloud.appDomains.copied",
+  "value": "Copied"
+ },
+ {
+  "key": "cloud.appDomains.copyRecordValue",
+  "value": "Copy {{type}} value"
+ },
+ {
+  "key": "cloud.appPromote.generateError",
+  "value": "Asset generation failed. Please try again."
+ },
+ {
+  "key": "cloud.applications.entryDescription",
+  "value": "Cloud OAuth applications: monetization, earnings, domains, analytics, users."
+ },
+ {
+  "key": "cloud.applications.entryTitle",
+  "value": "Manage applications"
+ },
+ {
+  "key": "cloud.apps.clearSelection",
+  "value": "Clear"
+ },
+ {
+  "key": "cloud.apps.deleteDialog.manyApps",
+  "value": "{{count}} apps"
+ },
+ {
+  "key": "cloud.apps.deleteDialog.titleMany",
+  "value": "Delete {{count}} Apps"
+ },
+ {
+  "key": "cloud.apps.deleteSelected",
+  "value": "Delete selected"
+ },
+ {
+  "key": "cloud.apps.emptyAgentHint",
+  "value": "Ask your Eliza agent to build and deploy an app — it will show up here to manage, monetize, and share."
+ },
+ {
+  "key": "cloud.apps.overview.deploy",
+  "value": "Deploy"
+ },
+ {
+  "key": "cloud.apps.overview.deployBuilding",
+  "value": "A deployment is in progress…"
+ },
+ {
+  "key": "cloud.apps.overview.deployFailed",
+  "value": "Deployment failed"
+ },
+ {
+  "key": "cloud.apps.overview.deployLive",
+  "value": "Your app is live. Redeploy to push the latest build."
+ },
+ {
+  "key": "cloud.apps.overview.deployPollTimeout",
+  "value": "Deployment is still running. Refresh the app to check status."
+ },
+ {
+  "key": "cloud.apps.overview.deployReady",
+  "value": "Deployment is live"
+ },
+ {
+  "key": "cloud.apps.overview.deployStarted",
+  "value": "Deployment started"
+ },
+ {
+  "key": "cloud.apps.overview.deployStatusFailed",
+  "value": "Failed to check deployment status"
+ },
+ {
+  "key": "cloud.apps.overview.deploying",
+  "value": "Deploying"
+ },
+ {
+  "key": "cloud.apps.overview.deployment",
+  "value": "Deployment"
+ },
+ {
+  "key": "cloud.apps.overview.redeploy",
+  "value": "Redeploy"
+ },
+ {
+  "key": "cloud.apps.selectedCount",
+  "value": "{{count}} selected"
+ },
+ {
+  "key": "cloud.apps.toast.deleteManySuccess",
+  "value": "{{count}} apps deleted"
+ },
+ {
+  "key": "cloud.apps.toast.deleteSomeFailed",
+  "value": "Failed to delete {{count}} app(s)"
+ },
+ {
+  "key": "cloud.authSuccess.returnToApp",
+  "value": "Return to the app to continue."
+ },
+ {
+  "key": "cloud.autoTopUp.activeState",
+  "value": "Active. Your saved card will be charged automatically."
+ },
+ {
+  "key": "cloud.autoTopUp.amountDescription",
+  "value": "Charged to card each cycle."
+ },
+ {
+  "key": "cloud.autoTopUp.amountLabel",
+  "value": "Top-up amount"
+ },
+ {
+  "key": "cloud.autoTopUp.amountMax",
+  "value": "Amount can't exceed $"
+ },
+ {
+  "key": "cloud.autoTopUp.amountMin",
+  "value": "Amount must be at least $"
+ },
+ {
+  "key": "cloud.autoTopUp.description",
+  "value": "Automatically charge your saved card when credits dip below the threshold. Earnings auto-fund runs first, so this only fires if earnings can't cover the gap."
+ },
+ {
+  "key": "cloud.autoTopUp.enableLabel",
+  "value": "Enable card auto top-up"
+ },
+ {
+  "key": "cloud.autoTopUp.noPaymentMethod",
+  "value": "No saved payment method. Add a card on the billing page first to enable auto top-up."
+ },
+ {
+  "key": "cloud.autoTopUp.offState",
+  "value": "Currently off — card won't be charged automatically."
+ },
+ {
+  "key": "cloud.autoTopUp.saveFailed",
+  "value": "Failed to save settings"
+ },
+ {
+  "key": "cloud.autoTopUp.saved",
+  "value": "Auto top-up settings saved"
+ },
+ {
+  "key": "cloud.autoTopUp.thresholdDescription",
+  "value": "Top-up kicks in below this credit balance."
+ },
+ {
+  "key": "cloud.autoTopUp.thresholdLabel",
+  "value": "Trigger threshold"
+ },
+ {
+  "key": "cloud.autoTopUp.thresholdMax",
+  "value": "Threshold can't exceed $"
+ },
+ {
+  "key": "cloud.autoTopUp.thresholdMin",
+  "value": "Threshold must be ≥ $"
+ },
+ {
+  "key": "cloud.autoTopUp.title",
+  "value": "Auto Top-Up (Card)"
+ },
+ {
+  "key": "cloud.billing.noAccount",
+  "value": "No account found for billing"
+ },
+ {
+  "key": "cloud.billingTab.amountLabel",
+  "value": "Amount (USD)"
+ },
+ {
+  "key": "cloud.billingTab.invoiceLoadFailed",
+  "value": "Invoice history could not be loaded"
+ },
+ {
+  "key": "cloud.bsc.checkoutInApp",
+  "value": "Continue your BSC credit purchase from the billing settings."
+ },
+ {
+  "key": "cloud.bsc.openBilling",
+  "value": "Open billing"
+ },
+ {
+  "key": "cloud.characterFilters.gridView",
+  "value": "Grid view"
+ },
+ {
+  "key": "cloud.characterFilters.listView",
+  "value": "List view"
+ },
+ {
+  "key": "cloud.cliLogin.returnToApp",
+  "value": "Return to your app to continue."
+ },
+ {
+  "key": "cloud.containers.agentActions.actionAlreadyInProgress",
+  "value": "{action} already in progress"
+ },
+ {
+  "key": "cloud.containers.agentActions.actionQueued",
+  "value": "{action} queued"
+ },
+ {
+  "key": "cloud.containers.agentActions.deleteHint",
+  "value": "Agent delete is running. This page will return to Instances when the job finishes."
+ },
+ {
+  "key": "cloud.containers.agentActions.deleteQueued",
+  "value": "Delete queued"
+ },
+ {
+  "key": "cloud.containers.agentActions.jobCompleted",
+  "value": "{action} completed"
+ },
+ {
+  "key": "cloud.containers.agentActions.jobFailed",
+  "value": "{action} failed"
+ },
+ {
+  "key": "cloud.containers.agentActions.resumeQueued",
+  "value": "Agent resume queued"
+ },
+ {
+  "key": "cloud.containers.agentActions.snapshotQueued",
+  "value": "Snapshot queued"
+ },
+ {
+  "key": "cloud.containers.agentActions.suspendQueued",
+  "value": "Suspend queued"
+ },
+ {
+  "key": "cloud.contributeCredential.apiKey",
+  "value": "API Key"
+ },
+ {
+  "key": "cloud.contributeCredential.apiKeyHint",
+  "value": "Validated with a live call before it enters the pool"
+ },
+ {
+  "key": "cloud.contributeCredential.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "cloud.contributeCredential.description",
+  "value": "Add a provider API key to your organization's shared pool. The key is validated live against the provider, then encrypted — nobody can ever read it back."
+ },
+ {
+  "key": "cloud.contributeCredential.done",
+  "value": "Done"
+ },
+ {
+  "key": "cloud.contributeCredential.failed",
+  "value": "Failed to add credential"
+ },
+ {
+  "key": "cloud.contributeCredential.keyTooShort",
+  "value": "Paste a full API key"
+ },
+ {
+  "key": "cloud.contributeCredential.label",
+  "value": "Label (optional)"
+ },
+ {
+  "key": "cloud.contributeCredential.labelPlaceholder",
+  "value": "e.g. work console key"
+ },
+ {
+  "key": "cloud.contributeCredential.maskedAs",
+  "value": "Listed in the pool as ••••{{last4}}"
+ },
+ {
+  "key": "cloud.contributeCredential.pooledDescription",
+  "value": "Your {{provider}} key passed live validation and is encrypted in the org vault. It's never shown again in the dashboard — everyone sees just the last 4 characters."
+ },
+ {
+  "key": "cloud.contributeCredential.pooledTitle",
+  "value": "Key Added to the Pool"
+ },
+ {
+  "key": "cloud.contributeCredential.provider",
+  "value": "Provider"
+ },
+ {
+  "key": "cloud.contributeCredential.submit",
+  "value": "Validate & Add"
+ },
+ {
+  "key": "cloud.contributeCredential.title",
+  "value": "Contribute an API Key"
+ },
+ {
+  "key": "cloud.contributeCredential.validating",
+  "value": "Validating..."
+ },
+ {
+  "key": "cloud.createAgent.createDedicated",
+  "value": "Create (don't start)"
+ },
+ {
+  "key": "cloud.createAgent.createShared",
+  "value": "Create shared agent"
+ },
+ {
+  "key": "cloud.createAgent.deployDedicated",
+  "value": "Deploy Docker container"
+ },
+ {
+  "key": "cloud.createAgent.executionMode",
+  "value": "Execution mode"
+ },
+ {
+  "key": "cloud.createAgent.image",
+  "value": "Image"
+ },
+ {
+  "key": "cloud.createAgent.modeDedicatedDescription",
+  "value": "Own Docker container on a Hetzner node. Required for custom images, always-on plugins (Discord/Telegram), or BYO runtime."
+ },
+ {
+  "key": "cloud.createAgent.modeDedicatedTitle",
+  "value": "Dedicated"
+ },
+ {
+  "key": "cloud.createAgent.modeSharedDescription",
+  "value": "Multi-tenant runtime. No container. Best for chat, webhooks and cron agents."
+ },
+ {
+  "key": "cloud.createAgent.modeSharedPrice",
+  "value": "free"
+ },
+ {
+  "key": "cloud.createAgent.modeSharedTitle",
+  "value": "Shared"
+ },
+ {
+  "key": "cloud.createAgent.sharedCostNote",
+  "value": "No compute cost. You only pay for LLM tokens consumed by the agent."
+ },
+ {
+  "key": "cloud.credentialsList.callsToday",
+  "value": "{{count}} calls today"
+ },
+ {
+  "key": "cloud.credentialsList.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "cloud.credentialsList.disabled",
+  "value": "Disabled"
+ },
+ {
+  "key": "cloud.credentialsList.empty",
+  "value": "No pooled credentials yet. Contribute a provider API key to get started."
+ },
+ {
+  "key": "cloud.credentialsList.lastUsed",
+  "value": "Last used {{when}}"
+ },
+ {
+  "key": "cloud.credentialsList.rateLimitedUntil",
+  "value": "Rate-limited until {{until}}"
+ },
+ {
+  "key": "cloud.credentialsList.remove",
+  "value": "Remove"
+ },
+ {
+  "key": "cloud.credentialsList.removeConfirm",
+  "value": "Remove {{label}} from the pool? The org stops rotating onto this key immediately. The key itself is deleted from the vault and cannot be recovered."
+ },
+ {
+  "key": "cloud.credentialsList.removeLabel",
+  "value": "Remove {{label}}"
+ },
+ {
+  "key": "cloud.credentialsList.removeTitle",
+  "value": "Remove Credential"
+ },
+ {
+  "key": "cloud.credentialsList.toggleLabel",
+  "value": "Toggle {{label}}"
+ },
+ {
+  "key": "cloud.credentialsList.unknownContributor",
+  "value": "Unknown"
+ },
+ {
+  "key": "cloud.credentialsList.you",
+  "value": "you"
+ },
+ {
+  "key": "cloud.credentialsTab.contribute",
+  "value": "Contribute Key"
+ },
+ {
+  "key": "cloud.credentialsTab.contributed",
+  "value": "Key validated and added to the pool"
+ },
+ {
+  "key": "cloud.credentialsTab.disabled",
+  "value": "Credential disabled"
+ },
+ {
+  "key": "cloud.credentialsTab.enabled",
+  "value": "Credential enabled"
+ },
+ {
+  "key": "cloud.credentialsTab.inviteAndConnect",
+  "value": "Invite & Connect"
+ },
+ {
+  "key": "cloud.credentialsTab.inviteSent",
+  "value": "Invitation created"
+ },
+ {
+  "key": "cloud.credentialsTab.removeFailed",
+  "value": "Failed to remove credential"
+ },
+ {
+  "key": "cloud.credentialsTab.removed",
+  "value": "Credential removed from the pool"
+ },
+ {
+  "key": "cloud.credentialsTab.subtitle",
+  "value": "Provider API keys your org rotates across. Keys are encrypted; only the last 4 characters are ever shown."
+ },
+ {
+  "key": "cloud.credentialsTab.title",
+  "value": "Team Credential Pool"
+ },
+ {
+  "key": "cloud.credentialsTab.updateFailed",
+  "value": "Failed to update credential"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.agentsDeleted",
+  "value": "{{count}} agents deleted"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.clearSelection",
+  "value": "Clear"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.deleteAgentsTitle",
+  "value": "Delete {{count}} Agents"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.deleteManyDesc",
+  "value": "This will permanently delete {{count}} agents and stop their running containers."
+ },
+ {
+  "key": "cloud.elizaAgentsTable.deleteSelected",
+  "value": "Delete selected"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.deleteSomeFailed",
+  "value": "Failed to delete {{count}} agent(s)"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.openElizaApp",
+  "value": "Open Eliza app"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.selectAgent",
+  "value": "Select agent"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.selectAll",
+  "value": "Select all agents"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.selectedCount",
+  "value": "{{count}} selected"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.shared",
+  "value": "Shared"
+ },
+ {
+  "key": "cloud.elizaAgentsTable.sharedRuntime",
+  "value": "Shared runtime"
+ },
+ {
+  "key": "cloud.home.addFunds",
+  "value": "Add funds"
+ },
+ {
+  "key": "cloud.home.balanceUnavailable",
+  "value": "Balance unavailable — retry shortly."
+ },
+ {
+  "key": "cloud.home.creditsAvailable",
+  "value": "Credits available"
+ },
+ {
+  "key": "cloud.home.loading",
+  "value": "Loading dashboard"
+ },
+ {
+  "key": "cloud.home.metaTitle",
+  "value": "Dashboard"
+ },
+ {
+  "key": "cloud.home.subtitle",
+  "value": "Manage your agents, credits, keys, and account."
+ },
+ {
+  "key": "cloud.home.title",
+  "value": "Overview"
+ },
+ {
+  "key": "cloud.join.connecting",
+  "value": "Connecting you to your agent..."
+ },
+ {
+  "key": "cloud.join.errorBody",
+  "value": "Something went wrong. Try again."
+ },
+ {
+  "key": "cloud.join.errorTitle",
+  "value": "Couldn't connect to your agent"
+ },
+ {
+  "key": "cloud.join.retry",
+  "value": "Try again"
+ },
+ {
+  "key": "cloud.login.back",
+  "value": "Back"
+ },
+ {
+  "key": "cloud.login.callback.codeRejected",
+  "value": "That sign-in link expired or was already used. Please sign in again below."
+ },
+ {
+  "key": "cloud.login.callback.invalidLink",
+  "value": "We couldn't verify that sign-in link. Request a new one. If it keeps happening, contact support."
+ },
+ {
+  "key": "cloud.login.callback.methodDisabled",
+  "value": "That sign-in method isn't enabled for this workspace."
+ },
+ {
+  "key": "cloud.login.callback.mfaRequired",
+  "value": "Additional verification is required to finish signing in."
+ },
+ {
+  "key": "cloud.login.callback.missingParams",
+  "value": "That sign-in link is incomplete. Request a new one."
+ },
+ {
+  "key": "cloud.login.callback.rateLimited",
+  "value": "Too many attempts. Wait a moment and try again."
+ },
+ {
+  "key": "cloud.login.callback.ssoRequired",
+  "value": "Your organization requires SSO to sign in."
+ },
+ {
+  "key": "cloud.login.callback.tenantMismatch",
+  "value": "That sign-in link is for a different workspace."
+ },
+ {
+  "key": "cloud.login.callback.tenantUnavailable",
+  "value": "Workspace not found or access denied."
+ },
+ {
+  "key": "cloud.login.checkingPasskey",
+  "value": "Checking passkey availability. You can continue with Magic Link or another sign-in method now."
+ },
+ {
+  "key": "cloud.login.completingSignIn",
+  "value": "Completing sign-in…"
+ },
+ {
+  "key": "cloud.login.emailCode.hint",
+  "value": "Use only the current email. A new email replaces the old code."
+ },
+ {
+  "key": "cloud.login.emailCode.label",
+  "value": "Six-digit code"
+ },
+ {
+  "key": "cloud.login.emailCode.resend",
+  "value": "Resend email"
+ },
+ {
+  "key": "cloud.login.emailCode.verify",
+  "value": "Verify code"
+ },
+ {
+  "key": "cloud.login.emailStatus.approved",
+  "value": "The link was approved elsewhere. This device was not signed in."
+ },
+ {
+  "key": "cloud.login.emailStatus.pending",
+  "value": "Waiting for the link or code."
+ },
+ {
+  "key": "cloud.login.loadingOptions.aria",
+  "value": "Loading sign-in options"
+ },
+ {
+  "key": "cloud.login.metaTitle",
+  "value": "Sign In | Eliza Cloud"
+ },
+ {
+  "key": "cloud.login.otp.createPasskey",
+  "value": "Create passkey"
+ },
+ {
+  "key": "cloud.login.otp.resend",
+  "value": "Resend code"
+ },
+ {
+  "key": "cloud.login.otp.subtitle",
+  "value": "Enter the 6-digit code we sent to"
+ },
+ {
+  "key": "cloud.login.otp.title",
+  "value": "Set up your passkey"
+ },
+ {
+  "key": "cloud.login.passkeyUnavailable",
+  "value": "Passkey sign-in is not available here. Use Google, Discord, or Magic Link, or open this sign-in link on another device."
+ },
+ {
+  "key": "cloud.login.signupHint",
+  "value": "New here? Passkey sets up your account in seconds."
+ },
+ {
+  "key": "cloud.mcps.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "cloud.mcps.categoryLabel",
+  "value": "Category"
+ },
+ {
+  "key": "cloud.mcps.configTitle",
+  "value": "Agent configuration"
+ },
+ {
+  "key": "cloud.mcps.createFailed",
+  "value": "Failed to create MCP"
+ },
+ {
+  "key": "cloud.mcps.createTitle",
+  "value": "Register MCP server"
+ },
+ {
+  "key": "cloud.mcps.created",
+  "value": "MCP created"
+ },
+ {
+  "key": "cloud.mcps.createdDesc",
+  "value": "Publish it to make it discoverable in the registry."
+ },
+ {
+  "key": "cloud.mcps.creditsLabel",
+  "value": "Credits per request"
+ },
+ {
+  "key": "cloud.mcps.delete",
+  "value": "Delete"
+ },
+ {
+  "key": "cloud.mcps.deleteConfirm",
+  "value": "This permanently removes the MCP server. This cannot be undone."
+ },
+ {
+  "key": "cloud.mcps.deleteFailed",
+  "value": "Failed to delete"
+ },
+ {
+  "key": "cloud.mcps.deleteTitle",
+  "value": "Delete MCP"
+ },
+ {
+  "key": "cloud.mcps.deleted",
+  "value": "MCP deleted"
+ },
+ {
+  "key": "cloud.mcps.descriptionLabel",
+  "value": "Description"
+ },
+ {
+  "key": "cloud.mcps.descriptionPlaceholder",
+  "value": "What does this MCP server do?"
+ },
+ {
+  "key": "cloud.mcps.docsUrlLabel",
+  "value": "Documentation URL (optional)"
+ },
+ {
+  "key": "cloud.mcps.edit",
+  "value": "Edit"
+ },
+ {
+  "key": "cloud.mcps.editDescription",
+  "value": "Register an external MCP endpoint so your agents and the registry can use it."
+ },
+ {
+  "key": "cloud.mcps.editTitle",
+  "value": "Edit MCP server"
+ },
+ {
+  "key": "cloud.mcps.endpointPathLabel",
+  "value": "Endpoint path"
+ },
+ {
+  "key": "cloud.mcps.endpointTitle",
+  "value": "MCP Endpoint"
+ },
+ {
+  "key": "cloud.mcps.loadingDetail",
+  "value": "Loading MCP..."
+ },
+ {
+  "key": "cloud.mcps.nameLabel",
+  "value": "Name"
+ },
+ {
+  "key": "cloud.mcps.namePlaceholder",
+  "value": "Weather Tools"
+ },
+ {
+  "key": "cloud.mcps.noBuiltin",
+  "value": "No built-in MCPs match your search."
+ },
+ {
+  "key": "cloud.mcps.noOwn",
+  "value": "You haven't registered any MCP servers yet."
+ },
+ {
+  "key": "cloud.mcps.noRegistry",
+  "value": "No public MCP servers match your search."
+ },
+ {
+  "key": "cloud.mcps.noTools",
+  "value": "No tools defined yet."
+ },
+ {
+  "key": "cloud.mcps.pricingLabel",
+  "value": "Pricing"
+ },
+ {
+  "key": "cloud.mcps.publish",
+  "value": "Publish"
+ },
+ {
+  "key": "cloud.mcps.publishFailed",
+  "value": "Failed to publish"
+ },
+ {
+  "key": "cloud.mcps.publishToTest",
+  "value": "Publish the MCP to test the connection."
+ },
+ {
+  "key": "cloud.mcps.published",
+  "value": "MCP published"
+ },
+ {
+  "key": "cloud.mcps.register",
+  "value": "Register MCP"
+ },
+ {
+  "key": "cloud.mcps.registerCta",
+  "value": "Register MCP"
+ },
+ {
+  "key": "cloud.mcps.responseTitle",
+  "value": "Connection test"
+ },
+ {
+  "key": "cloud.mcps.saveChanges",
+  "value": "Save changes"
+ },
+ {
+  "key": "cloud.mcps.saving",
+  "value": "Saving..."
+ },
+ {
+  "key": "cloud.mcps.slugHint",
+  "value": "Lowercase letters, numbers and dashes only."
+ },
+ {
+  "key": "cloud.mcps.slugLabel",
+  "value": "Slug"
+ },
+ {
+  "key": "cloud.mcps.statCredits",
+  "value": "Credits earned"
+ },
+ {
+  "key": "cloud.mcps.statRequests",
+  "value": "Requests"
+ },
+ {
+  "key": "cloud.mcps.statUsers",
+  "value": "Unique users"
+ },
+ {
+  "key": "cloud.mcps.statX402",
+  "value": "x402 (USD)"
+ },
+ {
+  "key": "cloud.mcps.statsTitle",
+  "value": "Usage"
+ },
+ {
+  "key": "cloud.mcps.tabBuiltin",
+  "value": "Built-in"
+ },
+ {
+  "key": "cloud.mcps.tabOwn",
+  "value": "My MCPs"
+ },
+ {
+  "key": "cloud.mcps.tabRegistry",
+  "value": "Registry"
+ },
+ {
+  "key": "cloud.mcps.test",
+  "value": "Test"
+ },
+ {
+  "key": "cloud.mcps.testing",
+  "value": "Testing..."
+ },
+ {
+  "key": "cloud.mcps.toolsHint",
+  "value": "At least one tool is required before you can publish."
+ },
+ {
+  "key": "cloud.mcps.toolsLabel",
+  "value": "Tools (one per line: name: description)"
+ },
+ {
+  "key": "cloud.mcps.toolsTitle",
+  "value": "Tools"
+ },
+ {
+  "key": "cloud.mcps.unpublish",
+  "value": "Unpublish"
+ },
+ {
+  "key": "cloud.mcps.unpublishFailed",
+  "value": "Failed to unpublish"
+ },
+ {
+  "key": "cloud.mcps.unpublished",
+  "value": "MCP unpublished"
+ },
+ {
+  "key": "cloud.mcps.updateFailed",
+  "value": "Failed to update MCP"
+ },
+ {
+  "key": "cloud.mcps.updated",
+  "value": "MCP updated"
+ },
+ {
+  "key": "cloud.mcps.viewDetails",
+  "value": "View details"
+ },
+ {
+  "key": "cloud.mcps.x402EnabledLabel",
+  "value": "Enable x402 micropayments"
+ },
+ {
+  "key": "cloud.mcps.x402PriceLabel",
+  "value": "Price per request (USD)"
+ },
+ {
+  "key": "cloud.monetization.reviewApproved",
+  "value": "Review approved. You can enable monetization."
+ },
+ {
+  "key": "cloud.monetization.reviewApprovedDesc",
+  "value": "This app passed review and can earn from paid usage."
+ },
+ {
+  "key": "cloud.monetization.reviewRequiredDesc",
+  "value": "Apps must pass automated review before monetization can be enabled."
+ },
+ {
+  "key": "cloud.monetization.reviewRequiredSave",
+  "value": "Submit this app for review before enabling monetization."
+ },
+ {
+  "key": "cloud.monetization.reviewRequiredToggle",
+  "value": "Submit this app for review before enabling monetization."
+ },
+ {
+  "key": "cloud.monetization.reviewStatusApproved",
+  "value": "Review approved"
+ },
+ {
+  "key": "cloud.monetization.reviewStatusInProgress",
+  "value": "Review in progress"
+ },
+ {
+  "key": "cloud.monetization.reviewStatusRejected",
+  "value": "Review rejected"
+ },
+ {
+  "key": "cloud.monetization.reviewStatusRequired",
+  "value": "Review required"
+ },
+ {
+  "key": "cloud.monetization.reviewStatusSubmitted",
+  "value": "Review submitted"
+ },
+ {
+  "key": "cloud.monetization.reviewSubmitFailed",
+  "value": "Failed to submit review"
+ },
+ {
+  "key": "cloud.monetization.reviewSubmitted",
+  "value": "Review submitted."
+ },
+ {
+  "key": "cloud.monetization.submitReview",
+  "value": "Submit for review"
+ },
+ {
+  "key": "cloud.monetization.tabAffiliates",
+  "value": "Affiliates"
+ },
+ {
+  "key": "cloud.monetization.tabEarnings",
+  "value": "Earnings"
+ },
+ {
+  "key": "cloud.privacyPanel.deleteUnavailable",
+  "value": "Deletion unavailable"
+ },
+ {
+  "key": "cloud.privacyPanel.exportUnavailable",
+  "value": "Export unavailable"
+ },
+ {
+  "key": "cloud.publicChat.startChat",
+  "value": "Chat with {{name}}"
+ },
+ {
+  "key": "cloud.redemptions.copyPayoutAddress",
+  "value": "Copy payout address"
+ },
+ {
+  "key": "cloud.redemptions.copyUserId",
+  "value": "Copy user ID"
+ },
+ {
+  "key": "cloud.security.metaTitle",
+  "value": "Security · Eliza Cloud"
+ },
+ {
+  "key": "cloud.security.pluginPermissionsLink",
+  "value": "Plugin permissions →"
+ },
+ {
+  "key": "configpageview.CloudServicesLoadFailed",
+  "value": "Could not load cloud service routing: ${\n              err instanceof Error ? err.message : String(err)\n            }"
+ },
+ {
+  "key": "configpageview.CloudServicesSaveFailed",
+  "value": "Could not update cloud service routing: ${\n              err instanceof Error ? err.message : String(err)\n            }"
+ },
+ {
+  "key": "conversations.channelMuted",
+  "value": "Channel muted"
+ },
+ {
+  "key": "conversations.muteChannel",
+  "value": "Mute channel"
+ },
+ {
+  "key": "conversations.muteFailed",
+  "value": "Failed to update mute state: {{message}}"
+ },
+ {
+  "key": "conversations.muteForDay",
+  "value": "Mute 8 hours"
+ },
+ {
+  "key": "conversations.muteForHour",
+  "value": "Mute 1 hour"
+ },
+ {
+  "key": "conversations.muteServer",
+  "value": "Mute server"
+ },
+ {
+  "key": "conversations.muteServerDuration",
+  "value": "Mute server duration"
+ },
+ {
+  "key": "conversations.searchMessages",
+  "value": "Search messages"
+ },
+ {
+  "key": "conversations.serverMuted",
+  "value": "Server muted"
+ },
+ {
+  "key": "conversations.unmuteChannel",
+  "value": "Unmute channel"
+ },
+ {
+  "key": "conversations.unmuteServer",
+  "value": "Unmute server"
+ },
+ {
+  "key": "databaseview.FilteredCount",
+  "value": "Filtered: {{shown}}/{{total}}"
+ },
+ {
+  "key": "databaseview.NoDataInsertViaSql",
+  "value": "No data yet. Insert rows via the SQL editor."
+ },
+ {
+  "key": "databaseview.StartAgentToUseDatabase",
+  "value": "Start the agent to use the database."
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.description",
+  "value": "A global keyboard shortcut that brings the floating chat surface to the foreground."
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.enableDescription",
+  "value": "The command palette keeps ⌘/Ctrl+K; this is a separate shortcut."
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.enableLabel",
+  "value": "Enable chat summon hotkey"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.listening",
+  "value": "Listening…"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.record",
+  "value": "Record"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.recording",
+  "value": "Press a key combination… (Esc to cancel)"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.reset",
+  "value": "Reset"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.shortcutLabel",
+  "value": "Shortcut"
+ },
+ {
+  "key": "desktopworkspacesection.chatHotkey.title",
+  "value": "Chat Summon Hotkey"
+ },
+ {
+  "key": "documentsview.DocumentUnavailable",
+  "value": "This document is no longer available."
+ },
+ {
+  "key": "documentsview.DocumentsUnavailableHere",
+  "value": "Knowledge isn't available on this device. Manage documents from the desktop or web app."
+ },
+ {
+  "key": "documentsview.ExitFullScreen",
+  "value": "Exit full screen"
+ },
+ {
+  "key": "documentsview.FullScreen",
+  "value": "Full screen"
+ },
+ {
+  "key": "downloadqueue.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "dynamicviewloader.back",
+  "value": "Back to views"
+ },
+ {
+  "key": "dynamicviewloader.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "filesview.downloadFailed",
+  "value": "Could not download {{name}}: {{message}}"
+ },
+ {
+  "key": "filesview.restrictedDescription",
+  "value": "Your role can't browse the file store. Shared items appear in their own views."
+ },
+ {
+  "key": "filesview.restrictedTitle",
+  "value": "Files are restricted"
+ },
+ {
+  "key": "filesview.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "filesview.searchPlaceholder",
+  "value": "Search files by name…"
+ },
+ {
+  "key": "inboxview.LoadFailed",
+  "value": "Couldn't load messages: {{message}}"
+ },
+ {
+  "key": "knowledgehub.approxCountHint",
+  "value": "Approximate — whole-store counts are unavailable."
+ },
+ {
+  "key": "knowledgehub.backToList",
+  "value": "Back to Knowledge"
+ },
+ {
+  "key": "knowledgehub.emptyHint",
+  "value": "Drop a file here, or ask in chat to import a URL or save a note."
+ },
+ {
+  "key": "knowledgehub.facetEmptyHint",
+  "value": "Switch facets above, or drop a file / ask in chat to add one."
+ },
+ {
+  "key": "knowledgehub.facetEmptyTitle",
+  "value": "No {{facet}} here"
+ },
+ {
+  "key": "knowledgehub.facetsLabel",
+  "value": "Filter knowledge by media type"
+ },
+ {
+  "key": "knowledgehub.readerTitle",
+  "value": "Knowledge"
+ },
+ {
+  "key": "knowledgehub.scopeLabel",
+  "value": "Filter knowledge by scope"
+ },
+ {
+  "key": "knowledgehub.title",
+  "value": "Knowledge"
+ },
+ {
+  "key": "logins.confirmDelete",
+  "value": "Delete saved login for {{domain}} ({{username}})?"
+ },
+ {
+  "key": "logsview.ErrorCount",
+  "value": "{{count}} errors"
+ },
+ {
+  "key": "mediagalleryview.DownloadFailed",
+  "value": "Could not download {{name}}: {{message}}"
+ },
+ {
+  "key": "memoryviewer.import.consent",
+  "value": "Import the scrubbed preview"
+ },
+ {
+  "key": "memoryviewer.import.conversations",
+  "value": "Conversations"
+ },
+ {
+  "key": "memoryviewer.import.deleteBatch",
+  "value": "Delete batch"
+ },
+ {
+  "key": "memoryviewer.import.file",
+  "value": "Export file"
+ },
+ {
+  "key": "memoryviewer.import.importButton",
+  "value": "Import"
+ },
+ {
+  "key": "memoryviewer.import.jobs",
+  "value": "Import jobs"
+ },
+ {
+  "key": "memoryviewer.import.messages",
+  "value": "Messages"
+ },
+ {
+  "key": "memoryviewer.import.noFile",
+  "value": "Choose JSON or text export"
+ },
+ {
+  "key": "memoryviewer.import.noTurns",
+  "value": "No importable conversation messages found."
+ },
+ {
+  "key": "memoryviewer.import.parseFailed",
+  "value": "Could not parse this export."
+ },
+ {
+  "key": "memoryviewer.import.progress",
+  "value": "{{done}}/{{total}}"
+ },
+ {
+  "key": "memoryviewer.import.redactions",
+  "value": "Redactions"
+ },
+ {
+  "key": "memoryviewer.import.retainRaw",
+  "value": "Keep raw source this session"
+ },
+ {
+  "key": "memoryviewer.import.scrubDefault",
+  "value": "Scrub secrets by default"
+ },
+ {
+  "key": "memoryviewer.import.source",
+  "value": "Source"
+ },
+ {
+  "key": "memoryviewer.import.subtitle",
+  "value": "Preview, scrub, consent, then write documents."
+ },
+ {
+  "key": "memoryviewer.import.tab",
+  "value": "Import"
+ },
+ {
+  "key": "memoryviewer.import.title",
+  "value": "Conversation import"
+ },
+ {
+  "key": "memoryviewer.peopleError",
+  "value": "Could not load people."
+ },
+ {
+  "key": "memoryviewer.viewMode",
+  "value": "Memory view mode"
+ },
+ {
+  "key": "messagecontent.BackgroundWidgetTitle",
+  "value": "Background"
+ },
+ {
+  "key": "messagecontent.LocalSignIn",
+  "value": "Authorize the desktop app"
+ },
+ {
+  "key": "messagecontent.LocalSignInFailed",
+  "value": "Couldn't authorize the desktop app."
+ },
+ {
+  "key": "messagecontent.LocalSigningIn",
+  "value": "Pairing…"
+ },
+ {
+  "key": "messagecontent.OAuthNoAuthUrl",
+  "value": "The connector did not return an authorization link."
+ },
+ {
+  "key": "messagecontent.OAuthSignIn",
+  "value": "Sign in with {{name}}"
+ },
+ {
+  "key": "messagecontent.OAuthSigningIn",
+  "value": "Waiting for sign-in…"
+ },
+ {
+  "key": "messagecontent.OAuthStartFailed",
+  "value": "Couldn't start the sign-in flow."
+ },
+ {
+  "key": "messagecontent.OAuthUseApiKey",
+  "value": "Use an API key / local setup instead"
+ },
+ {
+  "key": "messagecontent.SetupModeLabel",
+  "value": "Setup method"
+ },
+ {
+  "key": "modelcard.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "modelconfig.applyChanges",
+  "value": "Apply changes"
+ },
+ {
+  "key": "modelconfig.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "modelconfig.chatSaveNote",
+  "value": "Saving restarts the agent."
+ },
+ {
+  "key": "modelconfig.chooseEffort",
+  "value": "Choose an effort"
+ },
+ {
+  "key": "modelconfig.chooseModel",
+  "value": "Choose a model"
+ },
+ {
+  "key": "modelconfig.chooseProvider",
+  "value": "Choose a provider"
+ },
+ {
+  "key": "modelconfig.codingBackend",
+  "value": "Backend"
+ },
+ {
+  "key": "modelconfig.codingGroupDescription",
+  "value": "The model coding tasks are delegated to. Applies to the next coding task — no restart."
+ },
+ {
+  "key": "modelconfig.codingGroupTitle",
+  "value": "Coding sub-agent"
+ },
+ {
+  "key": "modelconfig.codingSaveNote",
+  "value": "Applies to the next coding task. No restart needed."
+ },
+ {
+  "key": "modelconfig.confirmRestart",
+  "value": "Restart & apply"
+ },
+ {
+  "key": "modelconfig.conflictingServiceEnv",
+  "value": "Service env also sets {{keys}} — a full service restart may override this value."
+ },
+ {
+  "key": "modelconfig.defaultBackend",
+  "value": "Default coding backend"
+ },
+ {
+  "key": "modelconfig.defaultBackendNote",
+  "value": "Use this backend for new coding tasks."
+ },
+ {
+  "key": "modelconfig.effort",
+  "value": "Reasoning effort"
+ },
+ {
+  "key": "modelconfig.emptyCatalog",
+  "value": "No configurable models were reported by the runtime."
+ },
+ {
+  "key": "modelconfig.freeFormModelNote",
+  "value": "Free-form model id — the in-house backend has no fixed catalog."
+ },
+ {
+  "key": "modelconfig.freeFormModelPlaceholder",
+  "value": "Model id"
+ },
+ {
+  "key": "modelconfig.largeGroupDescription",
+  "value": "Primary reasoning model for substantive replies."
+ },
+ {
+  "key": "modelconfig.largeGroupTitle",
+  "value": "Large model"
+ },
+ {
+  "key": "modelconfig.loadError",
+  "value": "Couldn't load the model catalog: {{message}}"
+ },
+ {
+  "key": "modelconfig.loading",
+  "value": "Loading model catalog…"
+ },
+ {
+  "key": "modelconfig.model",
+  "value": "Model"
+ },
+ {
+  "key": "modelconfig.panelTitle",
+  "value": "Models"
+ },
+ {
+  "key": "modelconfig.provider",
+  "value": "Provider"
+ },
+ {
+  "key": "modelconfig.providerFollowsActive",
+  "value": "(follows your active provider)"
+ },
+ {
+  "key": "modelconfig.restartConfirmBody",
+  "value": "Saving this change restarts the agent. Anything in progress is interrupted."
+ },
+ {
+  "key": "modelconfig.restartConfirmTitle",
+  "value": "Restart to apply?"
+ },
+ {
+  "key": "modelconfig.restarting",
+  "value": "Restarting agent…"
+ },
+ {
+  "key": "modelconfig.retry",
+  "value": "Retry"
+ },
+ {
+  "key": "modelconfig.save",
+  "value": "Save"
+ },
+ {
+  "key": "modelconfig.savedNoRestart",
+  "value": "Saved. Applies to the next coding task."
+ },
+ {
+  "key": "modelconfig.savedRestarted",
+  "value": "Saved"
+ },
+ {
+  "key": "modelconfig.saving",
+  "value": "Saving…"
+ },
+ {
+  "key": "modelconfig.sharedEffortNote",
+  "value": "One shared knob (OPENAI_REASONING_EFFORT) — also applies to the other chat model on this provider family."
+ },
+ {
+  "key": "modelconfig.smallGroupDescription",
+  "value": "Fast, cheap model for routing and lightweight replies."
+ },
+ {
+  "key": "modelconfig.smallGroupTitle",
+  "value": "Small model"
+ },
+ {
+  "key": "modelconfig.sourceDefault",
+  "value": "Built-in default"
+ },
+ {
+  "key": "modelconfig.sourceEnvironment",
+  "value": "Set by environment"
+ },
+ {
+  "key": "modelconfig.supportedValues",
+  "value": "Supported: {{values}}"
+ },
+ {
+  "key": "modelhub.notRunnable",
+  "value": "Not runnable on this platform"
+ },
+ {
+  "key": "permissionpriming.allSet",
+  "value": "You're all set."
+ },
+ {
+  "key": "permissionpriming.checking",
+  "value": "Checking permissions…"
+ },
+ {
+  "key": "permissionpriming.continue",
+  "value": "Continue"
+ },
+ {
+  "key": "permissionpriming.deniedRetry",
+  "value": "You can try again, or turn it on later in Settings."
+ },
+ {
+  "key": "permissionpriming.deniedSettings",
+  "value": "To enable it, open Settings and allow access, then re-check."
+ },
+ {
+  "key": "permissionpriming.deniedTitle",
+  "value": "Permission was declined"
+ },
+ {
+  "key": "permissionpriming.enable",
+  "value": "Enable"
+ },
+ {
+  "key": "permissionpriming.generic.rationale",
+  "value": "Enable this permission so I can complete the request you just made."
+ },
+ {
+  "key": "permissionpriming.generic.title",
+  "value": "Allow {{permission}}"
+ },
+ {
+  "key": "permissionpriming.iveEnabledIt",
+  "value": "I've enabled it"
+ },
+ {
+  "key": "permissionpriming.notNow",
+  "value": "Not now"
+ },
+ {
+  "key": "permissionpriming.requesting",
+  "value": "Requesting…"
+ },
+ {
+  "key": "permissionpriming.skipAll",
+  "value": "Skip for now"
+ },
+ {
+  "key": "permissionpriming.stepOf",
+  "value": "Step {{current}} of {{total}}"
+ },
+ {
+  "key": "permissionpriming.subtitle",
+  "value": "A couple of quick permissions so I'm ready to help."
+ },
+ {
+  "key": "permissionpriming.title",
+  "value": "Set up {{appName}}"
+ },
+ {
+  "key": "permissionpriming.tryAgain",
+  "value": "Try again"
+ },
+ {
+  "key": "permissionssection.MobilePermissionGrantNote",
+  "value": "If a permission was denied, open Settings and enable it for {{appName}}, then return here and refresh."
+ },
+ {
+  "key": "permissionssection.PermissionsError",
+  "value": "Could not read device permissions."
+ },
+ {
+  "key": "permissionssection.QuickSetup",
+  "value": "Quick setup"
+ },
+ {
+  "key": "permissionssection.QuickSetupNote",
+  "value": "Walk through the key permissions ({{appName}} voice, location, notifications) with an explanation for each."
+ },
+ {
+  "key": "permissionssection.Review",
+  "value": "Review"
+ },
+ {
+  "key": "permissionssection.SetUpPermissions",
+  "value": "Set up permissions"
+ },
+ {
+  "key": "permissionssection.SetUpPermissionsDesc",
+  "value": "Re-run the guided permission prompts, including any you previously declined."
+ },
+ {
+  "key": "pluginsview.LoadFailedDesc",
+  "value": "Couldn't load {{label}}: {{error}}. Check your connection and try again."
+ },
+ {
+  "key": "pluginsview.LoadFailedTitle",
+  "value": "Couldn't load {{label}}"
+ },
+ {
+  "key": "pluginsview.LoadingTitle",
+  "value": "Loading {{label}}…"
+ },
+ {
+  "key": "pluginsview.NeedsConfig",
+  "value": "Needs configuration"
+ },
+ {
+  "key": "pluginsview.Retry",
+  "value": "Retry"
+ },
+ {
+  "key": "pluginsview.Saved",
+  "value": "Saved"
+ },
+ {
+  "key": "pluginsview.SearchPlaceholder",
+  "value": "Search plugins…"
+ },
+ {
+  "key": "providerswitcher.accountsGroupDescription",
+  "value": "Connect provider accounts without scattering provider pickers across the page."
+ },
+ {
+  "key": "providerswitcher.accountsGroupTitle",
+  "value": "Accounts"
+ },
+ {
+  "key": "providerswitcher.activeProvider",
+  "value": "Active"
+ },
+ {
+  "key": "providerswitcher.activeProviderCodingAgents",
+  "value": "Active for coding agents"
+ },
+ {
+  "key": "providerswitcher.advancedDisclosureTitle",
+  "value": "Custom providers & model overrides"
+ },
+ {
+  "key": "providerswitcher.advancedGroupTitle",
+  "value": "Advanced"
+ },
+ {
+  "key": "providerswitcher.cloudTileDescription",
+  "value": "Managed models through your Eliza Cloud account. No setup — sign in and it works."
+ },
+ {
+  "key": "providerswitcher.codingSubscriptionChatNote",
+  "value": "Powers coding agents & workflows only — chat replies keep using your selected Intelligence provider (Cloud or Local)."
+ },
+ {
+  "key": "providerswitcher.intelligenceGroupDescription",
+  "value": "Choose what powers your agent's replies."
+ },
+ {
+  "key": "providerswitcher.intelligenceGroupTitle",
+  "value": "Intelligence"
+ },
+ {
+  "key": "providerswitcher.localTileDescription",
+  "value": "Runs entirely on this device with the bundled local model. Private and works offline."
+ },
+ {
+  "key": "providerswitcher.voiceGroupTitle",
+  "value": "Voice"
+ },
+ {
+  "key": "providerswitcher.voiceRowDescription",
+  "value": "Speech uses the bundled Kokoro voice — nothing to configure. Voice selection moves to your character."
+ },
+ {
+  "key": "providerswitcher.voiceRowLabel",
+  "value": "Kokoro (on-device)"
+ },
+ {
+  "key": "relationshipsgraph.graphAria",
+  "value": "Relationships graph"
+ },
+ {
+  "key": "relationshipsgraph.selectPerson",
+  "value": "Select {{name}}"
+ },
+ {
+  "key": "relationshipsgraph.toggleFit",
+  "value": "Toggle fit / 100%"
+ },
+ {
+  "key": "relationshipsgraph.toggleZoomAria",
+  "value": "Toggle zoom (fit / 100%)"
+ },
+ {
+  "key": "relationshipsgraph.zoomIn",
+  "value": "Zoom in"
+ },
+ {
+  "key": "relationshipsgraph.zoomOut",
+  "value": "Zoom out"
+ },
+ {
+  "key": "releasecenterview.ReleaseNotesUrl",
+  "value": "Release notes URL"
+ },
+ {
+  "key": "releasecenterview.Versions",
+  "value": "Versions"
+ },
+ {
+  "key": "remotepluginhost.uninstall",
+  "value": "Uninstall"
+ },
+ {
+  "key": "routing.rules.description",
+  "value": "Per-context overrides. Match keys exactly (e.g. OPENROUTER_API_KEY) or use wildcards (e.g. OPENROUTER_*)."
+ },
+ {
+  "key": "routingmatrix.autoCloud",
+  "value": "Auto: cloud · device is {{tier}}"
+ },
+ {
+  "key": "routingmatrix.autoOnDevice",
+  "value": "Auto: on-device · {{tier}} tier"
+ },
+ {
+  "key": "routingmatrix.priority",
+  "value": " (priority {{priority}})"
+ },
+ {
+  "key": "scheduledtask.acknowledge",
+  "value": "Acknowledge"
+ },
+ {
+  "key": "scheduledtask.applyError",
+  "value": "Failed to update scheduled item."
+ },
+ {
+  "key": "scheduledtask.complete",
+  "value": "Complete"
+ },
+ {
+  "key": "scheduledtask.dismiss",
+  "value": "Dismiss"
+ },
+ {
+  "key": "scheduledtask.missing",
+  "value": "This scheduled item is no longer available."
+ },
+ {
+  "key": "scheduledtask.noSchedule",
+  "value": "No schedule"
+ },
+ {
+  "key": "scheduledtask.prompt",
+  "value": "What it does"
+ },
+ {
+  "key": "scheduledtask.runNow",
+  "value": "Run now"
+ },
+ {
+  "key": "scheduledtask.schedule",
+  "value": "Schedule"
+ },
+ {
+  "key": "scheduledtask.snooze",
+  "value": "Snooze 1h"
+ },
+ {
+  "key": "settings.accent",
+  "value": "Accent color"
+ },
+ {
+  "key": "settings.advanced",
+  "value": "Advanced"
+ },
+ {
+  "key": "settings.appearance.packUrl",
+  "value": "Content pack URL"
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.connectCta",
+  "value": "Connect Cloud"
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.connecting",
+  "value": "Connecting..."
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.description",
+  "value": "Local connectors stay available in the regular Connectors tab. Cloud Connectors unlock hosted OAuth and bot gateways when you want messaging to keep working beyond this machine."
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.localModeDescription",
+  "value": "You can keep using local Discord, Telegram, Slack, iMessage, Signal, and WhatsApp connectors without Cloud."
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.localModeLabel",
+  "value": "Cloud is not connected"
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.loginError",
+  "value": "Could not start Cloud login."
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.title",
+  "value": "Hosted connector gateways"
+ },
+ {
+  "key": "settings.cloudConnectorsUpsell.unlockTitle",
+  "value": "What Cloud Connectors unlock"
+ },
+ {
+  "key": "settings.cloudOverview.accountDescription",
+  "value": "Signed in as {{id}}"
+ },
+ {
+  "key": "settings.cloudOverview.accountDescriptionNoId",
+  "value": "Signed in on this device."
+ },
+ {
+  "key": "settings.cloudOverview.accountLabel",
+  "value": "Cloud account"
+ },
+ {
+  "key": "settings.cloudOverview.connectCta",
+  "value": "Connect Cloud"
+ },
+ {
+  "key": "settings.cloudOverview.connectedCta",
+  "value": "Cloud connected"
+ },
+ {
+  "key": "settings.cloudOverview.connecting",
+  "value": "Connecting..."
+ },
+ {
+  "key": "settings.cloudOverview.description",
+  "value": "Keep Eliza local-first, then add hosted services when you want always-on agents, managed connectors, publishing, and account-backed inference."
+ },
+ {
+  "key": "settings.cloudOverview.signOut",
+  "value": "Sign out"
+ },
+ {
+  "key": "settings.cloudOverview.signingOut",
+  "value": "Signing out..."
+ },
+ {
+  "key": "settings.cloudOverview.title",
+  "value": "Eliza Cloud"
+ },
+ {
+  "key": "settings.cloudOverview.unlockTitle",
+  "value": "Unlock with Cloud"
+ },
+ {
+  "key": "settings.identity.groupTitle",
+  "value": "Identity"
+ },
+ {
+  "key": "settings.runtime.manageRuntimesHelp",
+  "value": "Saved local, cloud, and remote agents."
+ },
+ {
+  "key": "settings.runtime.manageRuntimesLabel",
+  "value": "My Runtimes"
+ },
+ {
+  "key": "settings.runtime.modeGroupTitle",
+  "value": "Runtime"
+ },
+ {
+  "key": "settings.runtime.sandboxGroupTitle",
+  "value": "Sandbox build"
+ },
+ {
+  "key": "settings.runtime.sandboxNote",
+  "value": "Local agent is unavailable in this build."
+ },
+ {
+  "key": "settings.sectionFailed",
+  "value": "{{title}} failed to load"
+ },
+ {
+  "key": "settings.sectionRetry",
+  "value": "Retry"
+ },
+ {
+  "key": "settings.sections.apps.groupTitle",
+  "value": "Apps"
+ },
+ {
+  "key": "settings.sections.apps.installedTitle",
+  "value": "Installed apps"
+ },
+ {
+  "key": "settings.sections.capabilities.capabilityRouterConnect",
+  "value": "Connect"
+ },
+ {
+  "key": "settings.sections.capabilities.capabilityRouterConnected",
+  "value": "Connected remote capability endpoint."
+ },
+ {
+  "key": "settings.sections.capabilities.capabilityRouterName",
+  "value": "Capability Router"
+ },
+ {
+  "key": "settings.sections.capabilities.groupTitle",
+  "value": "Capabilities"
+ },
+ {
+  "key": "settings.sections.capabilities.locationDenied",
+  "value": "Blocked. Allow location for this app in your browser or OS settings."
+ },
+ {
+  "key": "settings.sections.capabilities.locationEnable",
+  "value": "Enable"
+ },
+ {
+  "key": "settings.sections.capabilities.locationEnableLabel",
+  "value": "Enable precise location"
+ },
+ {
+  "key": "settings.sections.capabilities.locationGranted",
+  "value": "Precise location is on"
+ },
+ {
+  "key": "settings.sections.capabilities.locationGroupTitle",
+  "value": "Device Location"
+ },
+ {
+  "key": "settings.sections.capabilities.locationLabel",
+  "value": "Precise location"
+ },
+ {
+  "key": "settings.sections.capabilities.locationOff",
+  "value": "Off. Weather uses your approximate network location."
+ },
+ {
+  "key": "settings.sections.capabilities.locationUnsupported",
+  "value": "Not available on this device"
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveChatty",
+  "value": "Chatty"
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveHint",
+  "value": "How often the agent offers a helpful suggestion when you switch views or run a shortcut."
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveLabel",
+  "value": "Proactive suggestions"
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveName",
+  "value": "Proactive suggestions"
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveOff",
+  "value": "Off"
+ },
+ {
+  "key": "settings.sections.capabilities.proactiveSubtle",
+  "value": "Subtle"
+ },
+ {
+  "key": "settings.sections.connectors.disable",
+  "value": "Disable {{name}}"
+ },
+ {
+  "key": "settings.sections.connectors.enable",
+  "value": "Enable {{name}}"
+ },
+ {
+  "key": "settings.sections.connectors.groupTitle",
+  "value": "Connectors"
+ },
+ {
+  "key": "settings.sections.connectors.ownSetupSurface",
+  "value": "{{name}} uses its own setup surface."
+ },
+ {
+  "key": "startupfailureview.ChooseElizaCloud",
+  "value": "Choose Eliza Cloud"
+ },
+ {
+  "key": "streamview.StatusError",
+  "value": "Stream status error"
+ },
+ {
+  "key": "taskeditor.cancel",
+  "value": "Cancel"
+ },
+ {
+  "key": "taskeditor.createTask",
+  "value": "Create prompt automation"
+ },
+ {
+  "key": "taskeditor.cronLabel",
+  "value": "Cron expression"
+ },
+ {
+  "key": "taskeditor.eventLabel",
+  "value": "Trigger event"
+ },
+ {
+  "key": "taskeditor.promptLabel",
+  "value": "Prompt"
+ },
+ {
+  "key": "taskeditor.promptPlaceholder",
+  "value": "What should the agent do when this runs?"
+ },
+ {
+  "key": "taskeditor.promptRequired",
+  "value": "Prompt is required."
+ },
+ {
+  "key": "taskeditor.runsPrefix",
+  "value": "Runs "
+ },
+ {
+  "key": "taskeditor.saveError",
+  "value": "Failed to save prompt automation."
+ },
+ {
+  "key": "taskeditor.saveTask",
+  "value": "Save prompt automation"
+ },
+ {
+  "key": "taskeditor.scheduleEvent",
+  "value": "On event"
+ },
+ {
+  "key": "taskeditor.scheduleLegend",
+  "value": "Schedule"
+ },
+ {
+  "key": "taskeditor.scheduleOnce",
+  "value": "Once"
+ },
+ {
+  "key": "taskeditor.scheduleRecurring",
+  "value": "Recurring"
+ },
+ {
+  "key": "taskeditor.titleLabel",
+  "value": "Title"
+ },
+ {
+  "key": "taskeditor.titlePlaceholder",
+  "value": "Summarise yesterday's emails"
+ },
+ {
+  "key": "taskeditor.titleRequired",
+  "value": "Title is required."
+ },
+ {
+  "key": "taskseventspanel.Today",
+  "value": "Today"
+ },
+ {
+  "key": "trajectorydetailview.Latency",
+  "value": "Latency"
+ },
+ {
+  "key": "triggersview.DeleteTemplate",
+  "value": "Delete template"
+ },
+ {
+  "key": "voiceconfigview.AsrDeviceDefault",
+  "value": "Device default: {{provider}}"
+ },
+ {
+  "key": "voiceconfigview.AsrDownloading",
+  "value": "Downloading the local model. Using cloud until it's ready."
+ },
+ {
+  "key": "voiceconfigview.AsrProvider",
+  "value": "Speech-to-text"
+ },
+ {
+  "key": "voiceconfigview.AsrUsesOpenAiKey",
+  "value": "Uses your OpenAI API key from the Providers section."
+ },
+ {
+  "key": "voiceconfigview.BrowserVoice",
+  "value": "browser voice"
+ },
+ {
+  "key": "voiceconfigview.KokoroCloud",
+  "value": "Kokoro (Eliza Cloud)"
+ },
+ {
+  "key": "voiceconfigview.KokoroOnDevice",
+  "value": "Kokoro (on-device)"
+ },
+ {
+  "key": "voiceconfigview.TtsDeviceDefault",
+  "value": "Device default: {{provider}}"
+ },
+ {
+  "key": "voiceconfigview.advancedSettings",
+  "value": "Advanced settings"
+ },
+ {
+  "key": "voicesection.chatGroupTitle",
+  "value": "Voice chat"
+ },
+ {
+  "key": "voicesection.endOfTurn",
+  "value": "End of turn"
+ },
+ {
+  "key": "voicesection.micSensitivity",
+  "value": "Speech detection threshold"
+ },
+ {
+  "key": "voicesection.silenceDuration",
+  "value": "Silence before end of turn"
+ }
+]
