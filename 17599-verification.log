@@ -1,0 +1,32 @@
+== elizaOS/eliza#17599 local verification log ==
+date: 2026-08-03T00:19:47Z  host: macOS arm64  branch: fix/bun-runtime-unification  head: 9daafff9bb1466c603dbbd587ab9d117265274d9
+
+$ npm view bun version
+1.3.14
+
+$ bun --version
+1.3.14
+
+$ node packages/scripts/ci-bun-version-contract.mjs
+ci bun version contract passed (canonical 1.3.14; 435 sites scanned; 129 workflow pin(s) in lockstep; 9 gate lane(s) pinned; classifications: canonical=138, reviewed-sha=85, resolvable-expression=118, exact-canonical=20, compatible-range=72, drift=2)
+
+$ bun test packages/scripts/__tests__/ci-bun-version-contract.test.ts
+
+[0m[32m 20 pass[0m
+[0m[2m 0 fail[0m
+ 39 expect() calls
+Ran 20 tests across 1 file. [0m[2m[[1m511.00ms[0m[2m][0m
+
+$ bun install --frozen-lockfile --ignore-scripts
+Resolved, downloaded and extracted [51]
+
+Checked [32m4717 installs[0m across 5061 packages [2m(no changes)[0m [0m[2m[[1m485.00ms[0m[2m][0m[0m
+
+$ git diff --stat -- bun.lock package.json (post-install drift check)
+(empty above = no drift)
+
+$ grep -rn 'bun-version\|BUN_VERSION' .github | grep -iE ':\s*["'\'']?(canary|latest)' | grep -v 'pinned:'
+(empty above = zero floating remnants)
+
+$ grep -rn 'setup-bun@v2' .github | grep -v '# v2'
+(empty above = zero mutable refs)

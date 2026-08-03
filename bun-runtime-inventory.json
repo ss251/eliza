@@ -1,0 +1,3199 @@
+{
+  "canonical": "1.3.14",
+  "generatedAt": "2026-08-03T00:19:28.194Z",
+  "sites": [
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/admin-agent-image-canary.yml",
+      "line": 106,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/admin-agent-image-canary.yml",
+      "line": 104,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 86,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 232,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 299,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 84,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 230,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/android-device-e2e.yml",
+      "line": 297,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/android-release.yml",
+      "line": 86,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/android-release.yml",
+      "line": 84,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-aesthetic-audit.yml",
+      "line": 30,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-aesthetic-audit.yml",
+      "line": 55,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-aesthetic-audit.yml",
+      "line": 96,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 43,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 86,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 168,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 255,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 326,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-live-e2e.yml",
+      "line": 387,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-real-e2e.yml",
+      "line": 35,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/app-real-e2e.yml",
+      "line": 73,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/app-real-e2e.yml",
+      "line": 71,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/apple-store-release.yml",
+      "line": 88,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/apple-store-release.yml",
+      "line": 186,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/apple-store-release.yml",
+      "line": 351,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/apple-store-release.yml",
+      "line": 184,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/apple-store-release.yml",
+      "line": 349,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/attachment-journey-videos.yml",
+      "line": 15,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/attachment-journey-videos.yml",
+      "line": 36,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/benchmark-orchestrator-scheduled.yml",
+      "line": 55,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/benchmark-orchestrator-scheduled.yml",
+      "line": 105,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/benchmark-tests.yml",
+      "line": 63,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/benchmark-weekly.yml",
+      "line": 66,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/benchmark-weekly.yml",
+      "line": 94,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/browser-real-bench.yml",
+      "line": 40,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/browser-real-bench.yml",
+      "line": 69,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-agent-image.yml",
+      "line": 85,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-agent-image.yml",
+      "line": 83,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-android.yml",
+      "line": 53,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-android.yml",
+      "line": 51,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-debian-package.yml",
+      "line": 46,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-debian-package.yml",
+      "line": 44,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-example-app-images.yml",
+      "line": 58,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-example-app-images.yml",
+      "line": 229,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-example-app-images.yml",
+      "line": 56,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-example-app-images.yml",
+      "line": 227,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-linux-iso.yml",
+      "line": 88,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-linux-iso.yml",
+      "line": 81,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-llama-ffi-android.yml",
+      "line": 56,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-llama-ffi-android.yml",
+      "line": 130,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-llama-ffi-android.yml",
+      "line": 128,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/build-vm-image.yml",
+      "line": 63,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/build-vm-image.yml",
+      "line": 61,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cache-key-stability.yml",
+      "line": 38,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cache-key-stability.yml",
+      "line": 61,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cerebras-chat-flow-live.yml",
+      "line": 70,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cerebras-chat-flow-live.yml",
+      "line": 210,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cerebras-chat-flow-live.yml",
+      "line": 68,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cerebras-chat-flow-live.yml",
+      "line": 208,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cerebras-nightly.yml",
+      "line": 55,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cerebras-nightly.yml",
+      "line": 111,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/certification-verify.yml",
+      "line": 136,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/certification-verify.yml",
+      "line": 249,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/chat-shell-gestures.yml",
+      "line": 74,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/chat-shell-gestures.yml",
+      "line": 96,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci-full-matrix-proof.yml",
+      "line": 38,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci-full-matrix-proof.yml",
+      "line": 60,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci.yaml",
+      "line": 46,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci.yaml",
+      "line": 113,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci.yaml",
+      "line": 170,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ci.yaml",
+      "line": 200,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-aesthetic-audit.yml",
+      "line": 39,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-aesthetic-audit.yml",
+      "line": 62,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 242,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 422,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 872,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 1082,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 1487,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 237,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 414,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 870,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 1074,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-cf-deploy.yml",
+      "line": 1479,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 32,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 76,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 159,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 74,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 157,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "shell-install",
+      "file": ".github/workflows/cloud-deploy-backend.yml",
+      "line": 309,
+      "value": "curl -fsSL https://bun.sh/install | bash -s \"bun-v1.3.14\" # pinned: canonical CI Bun (.github/ci-bun-version.json)",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-gateway-discord.yml",
+      "line": 52,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-gateway-discord.yml",
+      "line": 68,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-gateway-discord.yml",
+      "line": 66,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-gateway-webhook.yml",
+      "line": 36,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cloud-gateway-webhook.yml",
+      "line": 52,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cloud-gateway-webhook.yml",
+      "line": 50,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/cuda-continuity.yml",
+      "line": 85,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/cuda-continuity.yml",
+      "line": 83,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/deploy-aasa.yml",
+      "line": 111,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/deploy-aasa.yml",
+      "line": 109,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "shell-install",
+      "file": ".github/workflows/deploy-apps-worker.yml",
+      "line": 203,
+      "value": "curl -fsSL https://bun.sh/install | bash -s \"bun-v1.3.14\" # pinned: canonical CI Bun (.github/ci-bun-version.json)",
+      "classification": "canonical"
+    },
+    {
+      "surface": "shell-install",
+      "file": ".github/workflows/deploy-eliza-provisioning-worker.yml",
+      "line": 332,
+      "value": "curl -fsSL https://bun.sh/install | bash -s \"bun-v1.3.14\" # pinned: canonical CI Bun (.github/ci-bun-version.json)",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/deploy-homepage.yml",
+      "line": 59,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/deploy-homepage.yml",
+      "line": 57,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/dev-smoke.yml",
+      "line": 40,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/dev-smoke.yml",
+      "line": 124,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/dev-smoke.yml",
+      "line": 195,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-exhaustive.yml",
+      "line": 121,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-exhaustive.yml",
+      "line": 165,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-live.yml",
+      "line": 100,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-pr.yml",
+      "line": 38,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-pr.yml",
+      "line": 109,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-pr.yml",
+      "line": 148,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/develop-pr.yml",
+      "line": 190,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/docker-ci-smoke.yml",
+      "line": 74,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/docker-ci-smoke.yml",
+      "line": 93,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/docker-ci-smoke.yml",
+      "line": 91,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/eliza-computer.yml",
+      "line": 61,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/eliza-computer.yml",
+      "line": 99,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/eliza-computer.yml",
+      "line": 221,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/eliza-computer.yml",
+      "line": 97,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/eliza-computer.yml",
+      "line": 219,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/elizaos-cuttlefish.yml",
+      "line": 91,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/elizaos-cuttlefish.yml",
+      "line": 89,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/elizaos-os-full-release.yml",
+      "line": 118,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/elizaos-os-full-release.yml",
+      "line": 116,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/elizaos-os-release.yml",
+      "line": 29,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/elizaos-os-release.yml",
+      "line": 27,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/evidence-tools-platform-smoke.yml",
+      "line": 51,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/evidence-tools-platform-smoke.yml",
+      "line": 49,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/external-api-live-drift.yml",
+      "line": 44,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/external-api-live-drift.yml",
+      "line": 91,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/external-api-live-drift.yml",
+      "line": 89,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/feed-apply-migrations.yml",
+      "line": 30,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/feed-apply-migrations.yml",
+      "line": 28,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/feed-env-audit.yml",
+      "line": 41,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/feed-test.yml",
+      "line": 79,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/feed-test.yml",
+      "line": 77,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hetzner-e2e-reaper.yml",
+      "line": 37,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/hetzner-e2e-reaper.yml",
+      "line": 35,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hetzner-e2e.yml",
+      "line": 94,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hetzner-e2e.yml",
+      "line": 361,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/hetzner-e2e.yml",
+      "line": 92,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/hetzner-e2e.yml",
+      "line": 359,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hetzner-provision-smoke.yml",
+      "line": 54,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/hetzner-provision-smoke.yml",
+      "line": 52,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hetzner-sleep-wake-smoke.yml",
+      "line": 90,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/hetzner-sleep-wake-smoke.yml",
+      "line": 88,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hyperliquid-bench-live.yml",
+      "line": 58,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/hyperliquid-bench-live.yml",
+      "line": 111,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/keyless-harness-e2e.yml",
+      "line": 44,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/keyless-harness-e2e.yml",
+      "line": 81,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/kokoro-real-smoke.yml",
+      "line": 60,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/kokoro-real-smoke.yml",
+      "line": 91,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/kokoro-real-smoke.yml",
+      "line": 89,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/launch-hardening-8756.yml",
+      "line": 42,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/launch-hardening-8756.yml",
+      "line": 40,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/launch-qa.yml",
+      "line": 23,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/launch-qa.yml",
+      "line": 43,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench-manifest.yml",
+      "line": 47,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench-manifest.yml",
+      "line": 77,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench-multi-tier.yml",
+      "line": 55,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench-multi-tier.yml",
+      "line": 122,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench-multi-tier.yml",
+      "line": 214,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench.yml",
+      "line": 58,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-bench.yml",
+      "line": 109,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-live-validation-11632.yml",
+      "line": 19,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-live-validation-11632.yml",
+      "line": 72,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-prompt-benchmark.yml",
+      "line": 41,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-prompt-benchmark.yml",
+      "line": 64,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-quality-bench.yml",
+      "line": 44,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/lifeops-quality-bench.yml",
+      "line": 67,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/live-scenarios.yml",
+      "line": 100,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/live-scenarios.yml",
+      "line": 160,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/loadperf.yml",
+      "line": 38,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/loadperf.yml",
+      "line": 63,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/loadperf.yml",
+      "line": 117,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 65,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 89,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 154,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 337,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 432,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 87,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 152,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 335,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/local-inference-bench.yml",
+      "line": 430,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-matrix.yml",
+      "line": 58,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/local-inference-matrix.yml",
+      "line": 158,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/local-inference-matrix.yml",
+      "line": 156,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/managed-dedicated-canary.yml",
+      "line": 117,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/managed-dedicated-canary.yml",
+      "line": 285,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/managed-dedicated-canary.yml",
+      "line": 115,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/managed-dedicated-canary.yml",
+      "line": 283,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/memperf.yml",
+      "line": 42,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/memperf.yml",
+      "line": 40,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-build-smoke.yml",
+      "line": 35,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-build-smoke.yml",
+      "line": 102,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-build-smoke.yml",
+      "line": 368,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-build-smoke.yml",
+      "line": 725,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-resource-workbench.yml",
+      "line": 104,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/mobile-resource-workbench.yml",
+      "line": 143,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/mobile-resource-workbench.yml",
+      "line": 102,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/mobile-resource-workbench.yml",
+      "line": 141,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/nightly.yml",
+      "line": 27,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/nightly.yml",
+      "line": 106,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/nightly.yml",
+      "line": 167,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/nightly.yml",
+      "line": 175,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/nightly.yml",
+      "line": 212,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/nightly.yml",
+      "line": 173,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/orchestrator-live-multi-account.yml",
+      "line": 45,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/orchestrator-live-multi-account.yml",
+      "line": 91,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/orchestrator-multi-account.yml",
+      "line": 42,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/orchestrator-multi-account.yml",
+      "line": 65,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/publish-android-update-manifest.yml",
+      "line": 56,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/publish-android-update-manifest.yml",
+      "line": 54,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/publish-example-code.yml",
+      "line": 105,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/publish-example-code.yml",
+      "line": 103,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "shell-install",
+      "file": ".github/workflows/publish-packages.yml",
+      "line": 295,
+      "value": "curl -fsSL https://bun.sh/install | bash -s \"bun-v1.3.14\" # pinned: canonical CI Bun (.github/ci-bun-version.json)",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/publish-plugin-elizacloud.yml",
+      "line": 82,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/publish-plugin-elizacloud.yml",
+      "line": 80,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 17,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 70,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 113,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 157,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 239,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/quality-fork.yml",
+      "line": 237,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 46,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 78,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 184,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 214,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 293,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/quality.yml",
+      "line": 344,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/recall-bench.yml",
+      "line": 52,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/recall-bench.yml",
+      "line": 48,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-candidate-pr.yml",
+      "line": 46,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-electrobun.yml",
+      "line": 88,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-electrobun.yml",
+      "line": 190,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-electrobun.yml",
+      "line": 336,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-electrobun.yml",
+      "line": 453,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/release-electrobun.yml",
+      "line": 451,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-elizaos-setup.yml",
+      "line": 35,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/release-elizaos-setup.yml",
+      "line": 33,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release-usb-installer.yml",
+      "line": 35,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/release-usb-installer.yml",
+      "line": 33,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release.yaml",
+      "line": 179,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release.yaml",
+      "line": 331,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/release.yaml",
+      "line": 429,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/riscv64-smoke.yml",
+      "line": 73,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/riscv64-smoke.yml",
+      "line": 71,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/sandbox-live-smoke.yml",
+      "line": 53,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/sandbox-live-smoke.yml",
+      "line": 105,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/sandbox-live-smoke.yml",
+      "line": 103,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 37,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 116,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 158,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 219,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 279,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 324,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 369,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 414,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 467,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 527,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 575,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 633,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 678,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 721,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/scenario-pr.yml",
+      "line": 798,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/snap-build-test.yml",
+      "line": 76,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/snap-build-test.yml",
+      "line": 74,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/terraform-pages-domains.yml",
+      "line": 43,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/terraform-pages-domains.yml",
+      "line": 41,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test-electrobun-release.yml",
+      "line": 26,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test-electrobun-release.yml",
+      "line": 53,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test-elizaos-setup.yml",
+      "line": 28,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/test-elizaos-setup.yml",
+      "line": 26,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test-packaging.yml",
+      "line": 226,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test-packaging.yml",
+      "line": 296,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/test-packaging.yml",
+      "line": 224,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/test-packaging.yml",
+      "line": 294,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 37,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 172,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 198,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 268,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 334,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 433,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 469,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 512,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 572,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 647,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 709,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 783,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 901,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 1048,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 1129,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 1173,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/test.yml",
+      "line": 1208,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/test.yml",
+      "line": 170,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-e2e-gate.yml",
+      "line": 58,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-e2e-gate.yml",
+      "line": 78,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-fixture-e2e.yml",
+      "line": 49,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-fixture-e2e.yml",
+      "line": 69,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-story-gate.yml",
+      "line": 46,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/ui-story-gate.yml",
+      "line": 66,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/vault-ci.yaml",
+      "line": 72,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/vault-ci.yaml",
+      "line": 163,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/vault-ci.yaml",
+      "line": 70,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/vault-ci.yaml",
+      "line": 161,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/view-bundle-size.yml",
+      "line": 50,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/view-bundle-size.yml",
+      "line": 48,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/views-soak.yml",
+      "line": 30,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/views-soak.yml",
+      "line": 64,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-bench-smoke.yml",
+      "line": 141,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/voice-bench-smoke.yml",
+      "line": 139,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 106,
+      "key": "BUN_VERSION",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 122,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 164,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 285,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 381,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 524,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 573,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 623,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 673,
+      "key": "bun-version",
+      "value": "${{ env.BUN_VERSION }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 120,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/voice-live-e2e.yml",
+      "line": 162,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/weekly-maintenance.yml",
+      "line": 48,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/weekly-maintenance.yml",
+      "line": 46,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/windows-ci.yml",
+      "line": 155,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/windows-ci.yml",
+      "line": 153,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/windows-desktop-preload-smoke.yml",
+      "line": 103,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/windows-dev-smoke.yml",
+      "line": 64,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/windows-dev-smoke.yml",
+      "line": 109,
+      "key": "bun-version",
+      "value": "${{ matrix.bun-version }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "workflow-version",
+      "file": ".github/workflows/windows-store-release.yml",
+      "line": 63,
+      "key": "bun-version",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/workflows/windows-store-release.yml",
+      "line": 61,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "action-version",
+      "file": ".github/actions/cloud-setup-test-env/action.yml",
+      "line": 44,
+      "key": "bun-version",
+      "value": "${{ inputs.bun-version }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/actions/cloud-setup-test-env/action.yml",
+      "line": 42,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "composite-default",
+      "file": ".github/actions/cloud-setup-test-env/action.yml",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "action-version",
+      "file": ".github/actions/setup-bun-workspace/action.yml",
+      "line": 305,
+      "key": "bun-version",
+      "value": "${{ inputs.bun-version }}",
+      "classification": "resolvable-expression"
+    },
+    {
+      "surface": "setup-bun-ref",
+      "file": ".github/actions/setup-bun-workspace/action.yml",
+      "line": 303,
+      "value": "0c5077e51419868618aeaa5fe8019c62421857d6",
+      "classification": "reviewed-sha"
+    },
+    {
+      "surface": "composite-default",
+      "file": ".github/actions/setup-bun-workspace/action.yml",
+      "value": "1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "packageManager",
+      "file": "package.json",
+      "value": "bun@1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "root-type-anchor",
+      "file": "package.json",
+      "value": "@types/bun@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "root-type-anchor",
+      "file": "package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/agent/package.json",
+      "value": "@types/bun@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/agent/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/app-core/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/app-core/platforms/electrobun/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/app/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/benchmarks/configbench/package.json",
+      "value": "bun-types@1.3.13",
+      "classification": "drift"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/benchmarks/personality-bench/package.json",
+      "value": "bun-types@1.3.13",
+      "classification": "drift"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/benchmarks/three-agent-dialogue/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/routing/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/_common/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/agent-server/package.json",
+      "value": "bun-types@^1.3.10",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/coding-remote-runner/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/container-control-plane/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/gateway-discord/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/gateway-webhook/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/services/operator/package.json",
+      "value": "@types/bun@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/cloud/shared/package.json",
+      "value": "bun-types@^1.3.13",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/core/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/elizaos/templates/project/apps/app/electrobun/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "packageManager",
+      "file": "packages/elizaos/templates/project/package.json",
+      "value": "bun@1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/agent-console/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/aws/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/cloud/edad/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/cloud/x402-image-gen/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/moltbook/package.json",
+      "value": "bun-types@^1.3.4",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/examples/smartglasses/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/apps/cli/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/apps/web/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "packageManager",
+      "file": "packages/feed/package.json",
+      "value": "bun@1.3.14",
+      "classification": "canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/a2a/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/agents/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/core/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/engine/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/examples/feed-typescript-agent/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/examples/harness/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/examples/local-a2a-server/package.json",
+      "value": "@types/bun@^1.1.0",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/mcp/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/feed/packages/sim/package.json",
+      "value": "bun-types@^1.3.2",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/os/setup/package.json",
+      "value": "@types/bun@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/os/usb-installer/package.json",
+      "value": "@types/bun@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/plugin-remote-manifest/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/plugin-sub-agent-claude-code/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/plugin-worker-runtime/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/shared/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/test/cloud-e2e/package.json",
+      "value": "bun-types@^1.3.13",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "packages/test/cloud-mocks/package.json",
+      "value": "bun-types@*",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-agent-orchestrator/package.json",
+      "value": "@types/bun@^1.3.9",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-agent-orchestrator/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-anthropic-proxy/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-anthropic/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-aosp-local-inference/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-background-runner/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-browser/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-calendar/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-capacitor-bridge/package.json",
+      "value": "@types/bun@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-cli-inference/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-cloud-apps/package.json",
+      "value": "@types/bun@^1.1.0",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-codex-cli/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-commands/package.json",
+      "value": "@types/bun@^1.2.22",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-computeruse/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-e2b-sandbox/package.json",
+      "value": "bun-types@^1.2.25",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-edge-tts/package.json",
+      "value": "@types/bun@^1.2.22",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-edge-tts/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-elevenlabs/package.json",
+      "value": "@types/bun@^1.2.22",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-elizacloud/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-embeddings/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-facewear/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-google-genai/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-groq/package.json",
+      "value": "@types/bun@^1.3.10",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-lmstudio/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-local-inference/native/voice-bench/package.json",
+      "value": "@types/bun@^1.1.13",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-local-storage/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-matrix/package.json",
+      "value": "@types/bun@^1.1.0",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-ngrok/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-ollama/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-openai/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-openrouter/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-pdf/package.json",
+      "value": "@types/bun@^1.3.10",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-personal-assistant/package.json",
+      "value": "bun-types@1.3.14",
+      "classification": "exact-canonical"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-phone/package.json",
+      "value": "bun-types@^1.3.14",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-pty/package.json",
+      "value": "bun-types@^1.2.25",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-registry/package.json",
+      "value": "bun-types@^1.3.12",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-shell/package.json",
+      "value": "bun-types@^1.2.25",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-signal/package.json",
+      "value": "bun-types@^1.2.25",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-slack/package.json",
+      "value": "bun-types@^1.2.25",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-sql/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-sql/src/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-tunnel/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-twitch/package.json",
+      "value": "@types/bun@^1.1.0",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-vision/package.json",
+      "value": "@types/bun@^1.3.5",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-workflow/package.json",
+      "value": "@types/bun@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-workflow/package.json",
+      "value": "bun-types@^1.3.8",
+      "classification": "compatible-range"
+    },
+    {
+      "surface": "workspace-type-range",
+      "file": "plugins/plugin-zai/package.json",
+      "value": "@types/bun@^1.3.10",
+      "classification": "compatible-range"
+    }
+  ]
+}
