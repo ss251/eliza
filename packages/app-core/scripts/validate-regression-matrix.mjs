@@ -180,6 +180,25 @@ function readText(relativePath) {
   );
 }
 
+/**
+ * Reads a file the manifest references. A manifest-named file the repo no longer
+ * contains is itself matrix-vs-repo drift — the class this validator exists to
+ * report — so it is collected as a failure instead of thrown, the way a missing
+ * manualChecklistDoc already is. Returns null when the file is absent.
+ */
+function readContractText(relativePath, failures, subject) {
+  const absolutePath = path.join(
+    REPO_ROOT,
+    resolveRepoRelativePath(relativePath),
+  );
+  if (!fs.existsSync(absolutePath)) {
+    failures.push(`${subject} references a missing file: ${relativePath}`);
+    return null;
+  }
+
+  return fs.readFileSync(absolutePath, "utf8");
+}
+
 function expandScheduledSuites(suiteIds) {
   const expanded = new Set(suiteIds);
   for (const suiteId of suiteIds) {
@@ -233,10 +252,16 @@ function collectChangedFiles(args) {
 
 function ensureWorkflowContracts(workflowName, failures) {
   const workflowContract = manifest.workflowContracts[workflowName];
-  const workflowTexts = workflowContract.files.map((relativePath) => ({
-    relativePath,
-    text: readText(relativePath),
-  }));
+  const workflowTexts = workflowContract.files
+    .map((relativePath) => ({
+      relativePath,
+      text: readContractText(
+        relativePath,
+        failures,
+        `Workflow "${workflowName}"`,
+      ),
+    }))
+    .filter((entry) => entry.text !== null);
 
   for (const suiteId of workflowContract.scheduledSuites) {
     const suite = manifest.suites[suiteId];
@@ -337,12 +362,16 @@ function ensureDesktopInventory(failures) {
   }
 
   const checklistText = fs.readFileSync(checklistPath, "utf8");
-  const inventoryTexts = (manifest.guards.desktopInventorySources ?? []).map(
-    (relativePath) => ({
+  const inventoryTexts = (manifest.guards.desktopInventorySources ?? [])
+    .map((relativePath) => ({
       relativePath,
-      text: readText(relativePath),
-    }),
-  );
+      text: readContractText(
+        relativePath,
+        failures,
+        "Desktop regression inventory source",
+      ),
+    }))
+    .filter((entry) => entry.text !== null);
 
   const items = [
     ...(manifest.exceptions.desktopHeavyInventory ?? []),
