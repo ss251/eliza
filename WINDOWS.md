@@ -117,9 +117,9 @@ Historically verified on a Windows GitHub runner:
 
 `plugin-agent-orchestrator` also runs broadly on Windows (686 of 701 tests
 pass, 686/701 = 97.9%). The 7 individual failures are path-comparison
-edge cases (cwd resolution, native-transport spawn formatting); they're
-listed in `WINDOWS.md`'s "follow-up" section and don't gate the install or
-the rest of the suite.
+edge cases (cwd resolution, native-transport spawn formatting) — the
+"3 files / 7 tests fail" row in the table above — and they don't gate the
+install or the rest of the suite.
 
 Many other plugins were not exercised because their tests need live
 external services (Twitter API, Discord gateway, real LLM endpoints,

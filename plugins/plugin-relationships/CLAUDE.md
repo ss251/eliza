@@ -123,7 +123,7 @@ needed.
 - **Do NOT add a second LifeOps scheduling mechanism, a second knowledge-graph
   store, or behavior keyed on `promptInstructions` text content.** This
   plugin owns *the* graph; lifeops keeps the scheduler and pipelines. See the
-  root `CLAUDE.md` "LifeOps + health: one scheduler" section.
+  root `CLAUDE.md` "Scheduling and personal-assistant domains" section.
 
 ## Verification
 
