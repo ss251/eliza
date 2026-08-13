@@ -87,19 +87,31 @@ try {
   process.exit(1);
 }
 
+// Turbo owns every argument before a bare `--` and forwards everything after it
+// to the tasks themselves. Every read and every injection in this file is scoped
+// to the owned half by this one helper, so no reader can drift from the others:
+// a token that belongs to a task must never be mistaken for turbo's own, and a
+// flag this wrapper adds must never land in a task's argv.
+function splitTurboArgs(args) {
+  const separatorIndex = args.indexOf("--");
+  return separatorIndex === -1
+    ? { own: args, passThrough: [] }
+    : {
+        own: args.slice(0, separatorIndex),
+        passThrough: args.slice(separatorIndex),
+      };
+}
+
 // Turbo accepts tasks as `turbo run <task>` or bare `turbo <task>`, with flags
-// anywhere in between (`run --filter=x typecheck`), and forwards everything
-// after a bare `--` to the tasks themselves. Collect every non-flag argument
-// before the `--` separator, dropping only a leading `run` command word, so
-// keyword pre-generation cannot be skipped by flag placement or the bare form.
-// A space-separated flag value (`--filter core`) may be miscounted as a task;
-// that errs toward running the idempotent generator, never toward skipping it.
-const passThroughIndex = rawTurboArgs.indexOf("--");
-const turboOwnArgs =
-  passThroughIndex === -1
-    ? rawTurboArgs
-    : rawTurboArgs.slice(0, passThroughIndex);
-const positionalArgs = turboOwnArgs.filter((arg) => !arg.startsWith("-"));
+// anywhere in between (`run --filter=x typecheck`). Collect every non-flag
+// argument before the `--` separator, dropping only a leading `run` command
+// word, so keyword pre-generation cannot be skipped by flag placement or the
+// bare form. A space-separated flag value (`--filter core`) may be miscounted as
+// a task; that errs toward running the idempotent generator, never toward
+// skipping it.
+const positionalArgs = splitTurboArgs(rawTurboArgs).own.filter(
+  (arg) => !arg.startsWith("-"),
+);
 const requestedTasks =
   positionalArgs[0] === "run" ? positionalArgs.slice(1) : positionalArgs;
 
@@ -161,14 +173,24 @@ const turboPackageBin =
   path.join(repoRoot, "node_modules/turbo/bin/turbo");
 let turboArgs = rawTurboArgs;
 
-if (!turboArgs.some((arg) => arg === "--ui" || arg.startsWith("--ui="))) {
+// A task's own `--ui` (playwright, vitest and friends all define one) says
+// nothing about how turbo should render, so only turbo's own half is consulted.
+if (
+  !splitTurboArgs(turboArgs).own.some(
+    (arg) => arg === "--ui" || arg.startsWith("--ui="),
+  )
+) {
   turboArgs.unshift("--ui=stream");
 }
 
-const runIndex = turboArgs.indexOf("run");
+// Re-split after the unshift above. `run` counts only as turbo's command word:
+// found after the separator it is a task's argument, and splicing there would
+// hand `--log-order=stream` to the task instead of to turbo.
+const { own: turboOwnArgs } = splitTurboArgs(turboArgs);
+const runIndex = turboOwnArgs.indexOf("run");
 if (
   runIndex !== -1 &&
-  !turboArgs.some(
+  !turboOwnArgs.some(
     (arg) => arg === "--log-order" || arg.startsWith("--log-order="),
   )
 ) {
@@ -181,11 +203,8 @@ if (
 // job exits 143 (#15140) — so CI lanes set this to 4 without forking the
 // `verify`/`typecheck` script definitions.
 function applyConcurrencyOverride(args, concurrency) {
-  const separatorIndex = args.indexOf("--");
-  const turboOwnArgs =
-    separatorIndex === -1 ? args : args.slice(0, separatorIndex);
-  const passThroughArgs =
-    separatorIndex === -1 ? [] : args.slice(separatorIndex);
+  const { own: turboOwnArgs, passThrough: passThroughArgs } =
+    splitTurboArgs(args);
   const normalizedTurboOwnArgs = [];
 
   for (let index = 0; index < turboOwnArgs.length; index += 1) {
