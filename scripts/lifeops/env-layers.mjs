@@ -50,6 +50,8 @@ const ENV_KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const LOCK_STALE_MS = 10_000;
 const LOCK_WAIT_MS = 5_000;
 const LOCK_POLL_MS = 25;
+/** Bounded RMW retries when commit-time ownership verification fails. */
+const WRITE_OWNERSHIP_RETRIES = 3;
 
 // --- pure primitives ---------------------------------------------------------
 
@@ -268,10 +270,16 @@ function readLockOwner(lockPath) {
  * so two reclaimers can never both pass a compare-and-unlink and admit
  * concurrent writers. If the captured record is not the observed dead one
  * (the lock was re-acquired between observation and rename), the capture is
- * undone with an exclusive link(); when even that loses to a newer lock, the
- * displaced owner is caught by writeSecret's commit-time ownership check.
+ * undone with an exclusive link(); when even that loses to a newer lock
+ * (EEXIST), the displaced owner's record is discarded and writeSecret's
+ * commit-time ownership check aborts that writer before the tmp→target
+ * rename so it retries the whole read-modify-write instead of committing
+ * a lost update.
+ *
+ * `options.afterCapture` is a test-only scheduling seam invoked after the
+ * quarantine rename and before restore/unlink; production callers omit it.
  */
-export function reclaimObservedLock(lockPath, observedRecord) {
+export function reclaimObservedLock(lockPath, observedRecord, options = {}) {
   const quarantine = `${lockPath}.reclaim.${process.pid}.${randomBytes(8).toString("hex")}`;
   try {
     renameSync(lockPath, quarantine);
@@ -279,6 +287,9 @@ export function reclaimObservedLock(lockPath, observedRecord) {
     // error-policy:J3 losing the rename race means another reclaimer won
     if (err.code === "ENOENT") return true;
     throw err;
+  }
+  if (typeof options.afterCapture === "function") {
+    options.afterCapture(quarantine);
   }
   let quarantined;
   try {
@@ -404,12 +415,40 @@ function releaseTargetLock(lock) {
   }
 }
 
-export function atomicWriteEnvFile(path, content) {
+/**
+ * Write `content` via tmp+rename (mode 600). Optional `beforeCommit` runs
+ * after the tmp is durable and before ownership confirmation — tests use it
+ * to schedule races. Optional `confirmCommit` is the last gate before the
+ * target rename; returning false unlinks the tmp and returns false so the
+ * caller can abort a displaced writer without committing.
+ */
+export function atomicWriteEnvFile(path, content, options = {}) {
   mkdirSync(dirname(path), { recursive: true });
   const tmp = `${path}.${process.pid}.${Date.now()}.${randomBytes(4).toString("hex")}.tmp`;
   try {
     writeFileSync(tmp, content, { encoding: "utf8", mode: 0o600 });
+    if (typeof options.beforeCommit === "function") {
+      options.beforeCommit();
+    }
+    if (
+      typeof options.confirmCommit === "function" &&
+      !options.confirmCommit()
+    ) {
+      try {
+        unlinkSync(tmp);
+      } catch (cleanupErr) {
+        // error-policy:J6 uncommitted tmp after ownership rejection
+        if (cleanupErr.code !== "ENOENT") {
+          throw new Error(
+            `atomicWriteEnvFile: ownership check rejected commit for ${path} and could not remove ${tmp}`,
+            { cause: cleanupErr },
+          );
+        }
+      }
+      return false;
+    }
     renameSync(tmp, path);
+    return true;
   } catch (err) {
     try {
       unlinkSync(tmp);
@@ -430,8 +469,12 @@ export function atomicWriteEnvFile(path, content) {
  * Upsert one KEY=value into the chosen layer file — scope 'home'
  * (~/.eliza/.env, created on first save; the default because it survives
  * worktree churn) or 'repo' (this checkout's .env). The target is locked,
- * reread, then written atomically (tmp+rename, mode 600). Also sets the key
- * on processEnv so probes running in the same process observe the save
+ * reread, then written atomically (tmp+rename, mode 600). Commit re-reads
+ * the lock record immediately before the tmp→target rename; a displaced
+ * owner fails that check, releases without committing, and retries the
+ * whole RMW (bounded), so a stale-observer reclaim that discards a live
+ * record on the restore-EEXIST edge cannot lose an update. Also sets the
+ * key on processEnv so probes running in the same process observe the save
  * immediately. Values must be single-line; multi-line values would corrupt
  * the dotenv format and are rejected.
  */
@@ -442,6 +485,7 @@ export function writeSecret(key, value, options = {}) {
     homeEnvPath = HOME_ENV_PATH,
     processEnv = process.env,
     afterRead,
+    beforeCommit,
     lockWaitMs = LOCK_WAIT_MS,
   } = options;
   if (typeof key !== "string" || !ENV_KEY_PATTERN.test(key)) {
@@ -456,21 +500,60 @@ export function writeSecret(key, value, options = {}) {
     );
   }
   const path = scope === "home" ? homeEnvPath : join(repoRoot, ".env");
-  // The lock IS the serialization: a writer that cannot acquire it within
-  // lockWaitMs fails fast rather than proceeding unserialized. Dead owners
-  // are reclaimed atomically inside acquireTargetLock; a live owner is never
-  // stolen, so the read-upsert-write below always runs alone.
-  const lock = acquireTargetLock(path, lockWaitMs);
-  try {
-    const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
-    if (typeof afterRead === "function") {
-      afterRead();
+  // The lock serializes writers: acquire within lockWaitMs or fail fast.
+  // Dead owners are reclaimed atomically inside acquireTargetLock. A live
+  // owner is never intentionally stolen; if a stale reclaim still discards
+  // a live record on the restore-EEXIST edge, commit-time ownership
+  // verification aborts before rename and the RMW retries.
+  for (let attempt = 1; attempt <= WRITE_OWNERSHIP_RETRIES; attempt += 1) {
+    const lock = acquireTargetLock(path, lockWaitMs);
+    let ownershipLost = false;
+    try {
+      const existing = existsSync(path) ? readFileSync(path, "utf8") : "";
+      if (typeof afterRead === "function") {
+        afterRead();
+      }
+      const next = upsertEnvContent(existing, { [key]: value });
+      const committed = atomicWriteEnvFile(path, next, {
+        beforeCommit,
+        // Last gate before rename: the lock bytes must still be the record
+        // this writer created. Anything else means displacement.
+        confirmCommit: () => stillOwnsLock(lock),
+      });
+      if (!committed) {
+        ownershipLost = true;
+      } else {
+        processEnv[key] = value;
+      }
+    } catch (err) {
+      try {
+        releaseTargetLock(lock);
+      } catch (releaseError) {
+        // error-policy:J2 preserve both the transaction and teardown failures
+        throw new AggregateError(
+          [err, releaseError],
+          `writeSecret(${key}): write and lock release both failed`,
+        );
+      }
+      throw err;
     }
-    atomicWriteEnvFile(path, upsertEnvContent(existing, { [key]: value }));
-    processEnv[key] = value;
-    return { key, scope, path };
-  } finally {
     releaseTargetLock(lock);
+    if (!ownershipLost) {
+      return { key, scope, path };
+    }
+  }
+  throw new Error(
+    `writeSecret(${key}): lock ownership lost ${WRITE_OWNERSHIP_RETRIES} times`,
+  );
+}
+
+function stillOwnsLock(lock) {
+  try {
+    return readFileSync(lock.lockPath, "utf8") === lock.ownerRecord;
+  } catch (err) {
+    // error-policy:J3 a missing lock record means ownership was displaced
+    if (err.code === "ENOENT") return false;
+    throw err;
   }
 }
 

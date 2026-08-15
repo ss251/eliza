@@ -514,9 +514,10 @@ function writeSecretInChild(
     join(ROOT, "scripts/lifeops/env-layers.mjs"),
   ).href;
   const script = `
-    import { existsSync } from "node:fs";
+    import { existsSync, writeFileSync } from "node:fs";
     import { writeSecret } from ${JSON.stringify(moduleUrl)};
     const waitPath = ${JSON.stringify(afterReadWaitPath ?? "")};
+    const readyPath = ${JSON.stringify(options.readyPath ?? "")};
     writeSecret(${JSON.stringify(key)}, ${JSON.stringify(value)}, {
       scope: "repo",
       repoRoot: ${JSON.stringify(repoRoot)},
@@ -524,9 +525,32 @@ function writeSecretInChild(
       ...(${JSON.stringify(options.lockWaitMs ?? null)} === null
         ? {}
         : { lockWaitMs: ${JSON.stringify(options.lockWaitMs ?? null)} }),
+      ...(${JSON.stringify(options.beforeCommitWaitPath ?? null)} === null
+        ? {}
+        : {
+            beforeCommit: (() => {
+              let fired = false;
+              return () => {
+                if (fired) return;
+                fired = true;
+                const wp = ${JSON.stringify(options.beforeCommitWaitPath ?? null)};
+                const deadline = Date.now() + 8000;
+                while (!existsSync(wp) && Date.now() < deadline) {
+                  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+                }
+              };
+            })(),
+          }),
       afterRead: waitPath
         ? () => {
-            const deadline = Date.now() + 5000;
+            if (readyPath) {
+              try {
+                writeFileSync(readyPath, "ready\\n");
+              } catch {
+                // best-effort scheduling signal for the parent harness
+              }
+            }
+            const deadline = Date.now() + 8000;
             while (!existsSync(waitPath) && Date.now() < deadline) {
               Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
             }
@@ -648,6 +672,131 @@ test("writeSecret fails fast when a live owner holds the lock past the wait", as
     rmSync(base, { recursive: true, force: true });
   }
 }, 20_000);
+
+test("a displaced writer fails loudly instead of committing a lost update", async () => {
+  const base = tempDir("env-layers-owned-lock-");
+  try {
+    const lockPath = `${join(base, ".env")}.lock`;
+    const waitPath = join(base, "release-writer");
+    const writer = writeSecretInChild(base, "TOKEN", "secret", waitPath, {
+      allowFailure: true,
+      lockWaitMs: 500,
+    });
+    const started = Date.now();
+    while (Date.now() - started < 2000 && !existsSync(lockPath)) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+    }
+    assert.equal(existsSync(lockPath), true, "writer must acquire the lock");
+
+    unlinkSync(lockPath);
+    const replacementOwner = `${process.pid}:${"a".repeat(32)}\n`;
+    writeFileSync(lockPath, replacementOwner, { mode: 0o600 });
+    writeFileSync(waitPath, "go\n");
+    const result = await writer;
+
+    // Commit-time ownership verification: the displaced writer must not
+    // commit, must leave the usurper's record intact, and must exit loudly
+    // once the held foreign lock starves its retries.
+    assert.notEqual(result.code, 0);
+    assert.match(
+      result.stderr,
+      /lock ownership lost|timed out waiting for lock/,
+    );
+    assert.equal(readFileSync(lockPath, "utf8"), replacementOwner);
+    assert.equal(existsSync(join(base, ".env")), false);
+    unlinkSync(lockPath);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+}, 20_000);
+
+test("stale-observer reclaim EEXIST cannot lose concurrent distinct writes", async () => {
+  // Maintainer P1 order at de6c6048:
+  // 1) dead owner observed by stale reclaimer R2
+  // 2) live writer B reclaims, re-acquires, pauses after read
+  // 3) R2 renames B's live lock into quarantine (stale observation)
+  // 4) writer C acquires the empty pathname and pauses after read
+  // 5) R2 linkSync restore hits EEXIST; B's record is discarded
+  // 6) both resume — commit-time ownership makes B abort+retry so both keys survive
+  const base = tempDir("env-layers-stale-observer-eexist-");
+  try {
+    const envPath = join(base, ".env");
+    const lockPath = `${envPath}.lock`;
+    mkdirSync(base, { recursive: true });
+
+    const dead = spawn(process.execPath, ["-e", "process.exit(0)"]);
+    await new Promise((resolvePromise) => dead.once("close", resolvePromise));
+    const deadRecord = `${dead.pid}:${"e".repeat(32)}\n`;
+    writeFileSync(lockPath, deadRecord, { mode: 0o600 });
+
+    const goB = join(base, "go-b");
+    const readyB = join(base, "ready-b");
+    const goC = join(base, "go-c");
+    const readyC = join(base, "ready-c");
+
+    const b = writeSecretInChild(base, "KEY_B", "bbb", goB, {
+      readyPath: readyB,
+      lockWaitMs: 8_000,
+    });
+
+    const readyDeadline = Date.now() + 5_000;
+    while (!existsSync(readyB) && Date.now() < readyDeadline) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+    }
+    assert.equal(
+      existsSync(readyB),
+      true,
+      "B must reach afterRead holding the lock",
+    );
+    const bOwner = readFileSync(lockPath, "utf8");
+    assert.notEqual(bOwner, deadRecord, "B must own a fresh live record");
+
+    let c;
+    const restored = reclaimObservedLock(lockPath, deadRecord, {
+      afterCapture: () => {
+        // Pathname is empty while B's live record sits in quarantine.
+        // C acquires before R2's exclusive link restore runs.
+        c = writeSecretInChild(base, "KEY_C", "ccc", goC, {
+          readyPath: readyC,
+          lockWaitMs: 8_000,
+        });
+        const cDeadline = Date.now() + 5_000;
+        while (!existsSync(readyC) && Date.now() < cDeadline) {
+          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+        }
+      },
+    });
+    assert.equal(
+      restored,
+      false,
+      "stale observation must not treat live capture as dead",
+    );
+    assert.equal(
+      existsSync(readyC),
+      true,
+      "C must acquire during restore-EEXIST window",
+    );
+    const cOwner = readFileSync(lockPath, "utf8");
+    assert.notEqual(
+      cOwner,
+      bOwner,
+      "C holds the pathname; B's record was discarded",
+    );
+    assert.notEqual(cOwner, deadRecord);
+
+    // Release B first: ownership check fails, B retries and waits on C.
+    writeFileSync(goB, "go\n");
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 200);
+    writeFileSync(goC, "go\n");
+    await Promise.all([b, c]);
+
+    const parsed = parseDotenv(readFileSync(envPath, "utf8"));
+    assert.equal(parsed.KEY_B, "bbb");
+    assert.equal(parsed.KEY_C, "ccc");
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+}, 30_000);
 
 test("an external hand-edit between writes is adopted as the base", () => {
   const base = tempDir("env-layers-external-edit-");
