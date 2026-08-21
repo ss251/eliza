@@ -30,6 +30,22 @@ type StoredDiscordEntityProfile = {
 
 const DISCORD_PROFILE_CACHE_TTL_MS = 5 * 60_000;
 
+/**
+ * Hard entry cap for both profile caches.
+ *
+ * The TTL alone cannot bound them: it is only enforced lazily, on a *read of
+ * the same key*. `discordMessageAuthorProfileCache` is keyed by
+ * `channelId:messageId`, so in the common case a key is written once and never
+ * looked up again — the entry expires but is never reached by a read, and so
+ * is never deleted. Both maps are module scoped and therefore outlive service
+ * restarts, giving unbounded heap growth over process lifetime.
+ *
+ * Same invariant the DM registry already holds ("bounded LRU (newest wins) so
+ * the file can never grow with guild count or traffic",
+ * `dm-channel-registry.ts`), applied to the in-memory profile caches.
+ */
+export const DISCORD_PROFILE_CACHE_MAX_ENTRIES = 512;
+
 const discordUserProfileCache = new Map<
 	string,
 	{ expiresAt: number; value: DiscordUserProfile | null }
@@ -39,6 +55,22 @@ const discordMessageAuthorProfileCache = new Map<
 	string,
 	{ expiresAt: number; value: DiscordMessageAuthorProfile | null }
 >();
+
+/**
+ * Current entry counts of the two profile caches.
+ *
+ * Exposed so the bound is observable: the caches are module scoped and hold no
+ * message content, only resolved display names and avatar URLs.
+ */
+export function getDiscordProfileCacheSizes(): {
+	messageAuthors: number;
+	users: number;
+} {
+	return {
+		messageAuthors: discordMessageAuthorProfileCache.size,
+		users: discordUserProfileCache.size,
+	};
+}
 
 type DiscordClientLike = {
 	channels?: {
@@ -61,6 +93,42 @@ function readCachedValue<T>(
 		return undefined;
 	}
 	return entry.value;
+}
+
+/**
+ * Insert with a bounded, newest-wins eviction policy.
+ *
+ * Re-inserting an existing key deletes it first so the entry moves to the
+ * newest end of the Map's insertion order. When the cap is reached we first
+ * drop entries whose TTL has already lapsed (they are dead weight no read will
+ * ever collect), and only if that frees nothing do we evict the oldest live
+ * entry. That ordering keeps a burst of fresh lookups from discarding each
+ * other while stale entries sit in front of them.
+ */
+function writeCachedValue<T>(
+	cache: Map<string, { expiresAt: number; value: T }>,
+	key: string,
+	value: T,
+	now: number,
+	maxEntries: number = DISCORD_PROFILE_CACHE_MAX_ENTRIES,
+): void {
+	cache.delete(key);
+	cache.set(key, { expiresAt: now + DISCORD_PROFILE_CACHE_TTL_MS, value });
+
+	if (cache.size <= maxEntries) return;
+
+	for (const [existingKey, entry] of cache) {
+		if (cache.size <= maxEntries) break;
+		if (entry.expiresAt <= now && existingKey !== key) {
+			cache.delete(existingKey);
+		}
+	}
+
+	while (cache.size > maxEntries) {
+		const oldestKey = cache.keys().next().value;
+		if (oldestKey === undefined || oldestKey === key) break;
+		cache.delete(oldestKey);
+	}
 }
 
 function getDiscordClient(runtime: AgentRuntime): DiscordClientLike | null {
@@ -265,10 +333,12 @@ export async function resolveDiscordMessageAuthorProfile(
 					.messages.fetch
 			: null;
 	if (!fetchMessage) {
-		discordMessageAuthorProfileCache.set(cacheKey, {
-			expiresAt: Date.now() + DISCORD_PROFILE_CACHE_TTL_MS,
-			value: null,
-		});
+		writeCachedValue(
+			discordMessageAuthorProfileCache,
+			cacheKey,
+			null,
+			Date.now(),
+		);
 		return null;
 	}
 
@@ -299,16 +369,20 @@ export async function resolveDiscordMessageAuthorProfile(
 			avatarUrl: readDiscordAvatarUrl(author),
 			...(rawUserId ? { rawUserId } : {}),
 		};
-		discordMessageAuthorProfileCache.set(cacheKey, {
-			expiresAt: Date.now() + DISCORD_PROFILE_CACHE_TTL_MS,
-			value: profile,
-		});
+		writeCachedValue(
+			discordMessageAuthorProfileCache,
+			cacheKey,
+			profile,
+			Date.now(),
+		);
 		return profile;
 	} catch {
-		discordMessageAuthorProfileCache.set(cacheKey, {
-			expiresAt: Date.now() + DISCORD_PROFILE_CACHE_TTL_MS,
-			value: null,
-		});
+		writeCachedValue(
+			discordMessageAuthorProfileCache,
+			cacheKey,
+			null,
+			Date.now(),
+		);
 		return null;
 	}
 }
@@ -336,16 +410,10 @@ export async function resolveDiscordUserProfile(
 					: undefined,
 			avatarUrl: readDiscordAvatarUrl(user),
 		};
-		discordUserProfileCache.set(userId, {
-			expiresAt: Date.now() + DISCORD_PROFILE_CACHE_TTL_MS,
-			value: profile,
-		});
+		writeCachedValue(discordUserProfileCache, userId, profile, Date.now());
 		return profile;
 	} catch {
-		discordUserProfileCache.set(userId, {
-			expiresAt: Date.now() + DISCORD_PROFILE_CACHE_TTL_MS,
-			value: null,
-		});
+		writeCachedValue(discordUserProfileCache, userId, null, Date.now());
 		return null;
 	}
 }
