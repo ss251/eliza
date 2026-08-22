@@ -1008,7 +1008,12 @@ export class ResponseSkeletonStreamExtractor implements IStreamExtractor {
 				const needed = this.pendingEscape === "\\u" ? 4 : 1;
 				if (this.buffer.length < needed) {
 					flushPlain();
-					return final;
+					if (!final) {
+						return false;
+					}
+					// Stream ended mid-escape: fall through to the end-of-stream
+					// field termination below, which preserves the raw bytes.
+					break;
 				}
 				const raw = this.pendingEscape + this.buffer.slice(0, needed);
 				this.buffer = this.buffer.slice(needed);
@@ -1036,7 +1041,10 @@ export class ResponseSkeletonStreamExtractor implements IStreamExtractor {
 				if (this.buffer.length === 0) {
 					this.pendingEscape = "\\";
 					flushPlain();
-					return final;
+					if (!final) {
+						return false;
+					}
+					break;
 				}
 				const next = this.buffer[0];
 				this.buffer = this.buffer.slice(1);
@@ -1052,8 +1060,34 @@ export class ResponseSkeletonStreamExtractor implements IStreamExtractor {
 			plain += char;
 		}
 
+		// Buffer exhausted mid-field while streaming: keep the field open and
+		// wait for more data (identical to the original `return final` path).
+		if (!final) {
+			flushPlain();
+			return false;
+		}
+
+		// End of stream with a string field still open (truncated envelope:
+		// max-token cutoff, transport drop, or an unconstrained backend).
+		// Returning `true` here without clearing the field made both drain
+		// loops spin forever inside flush(). Terminate exactly like the
+		// closing-quote branch, preserving every received byte: an incomplete
+		// escape's raw characters are emitted verbatim instead of dropped.
+		if (this.pendingEscape) {
+			plain += this.pendingEscape + this.buffer;
+			this.pendingEscape = "";
+			this.buffer = "";
+		}
 		flushPlain();
-		return final;
+		const flushed = this.flushReasoningFilter(field);
+		if (flushed) {
+			this.appendVisibleAndEmit(field, flushed);
+		}
+		this.activeStringField = null;
+		if (advanceSpan) {
+			this.spanIndex++;
+		}
+		return true;
 	}
 
 	private appendAndEmit(field: string, value: string): void {

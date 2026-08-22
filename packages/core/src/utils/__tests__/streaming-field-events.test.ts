@@ -1,8 +1,9 @@
 /**
  * Streaming field extractors (StructuredFieldStreamExtractor,
  * ResponseSkeletonStreamExtractor): per-field start/done/chunk events, clean
- * text-only streaming, JSON-skeleton field selection, think-tag hiding, and
- * abort handling, fed in small slices to exercise chunk boundaries.
+ * text-only streaming, JSON-skeleton field selection, think-tag hiding, abort
+ * handling, and truncated-stream flush termination, fed in small slices to
+ * exercise chunk boundaries.
  */
 import { describe, expect, it } from "vitest";
 import type { SchemaRow } from "../../types/state";
@@ -468,5 +469,167 @@ describe("ResponseSkeletonStreamExtractor", () => {
 		// A further push after abort must NOT emit a duplicate error event.
 		extractor.push("ignored");
 		expect(events.filter((e) => e.eventType === "error")).toHaveLength(1);
+	});
+});
+
+describe("ResponseSkeletonStreamExtractor truncated-stream flush", () => {
+	const skeleton = {
+		spans: [
+			{ kind: "literal" as const, value: "{" },
+			{ kind: "literal" as const, value: '"replyText":' },
+			{ kind: "free-string" as const, key: "replyText" },
+			{ kind: "literal" as const, value: "}" },
+		],
+	};
+
+	function makeExtractor(options: {
+		unordered?: boolean;
+		chunks: string[];
+		events: string[];
+	}) {
+		return new ResponseSkeletonStreamExtractor({
+			skeleton,
+			streamFields: ["replyText"],
+			unordered: options.unordered,
+			onChunk: (chunk) => options.chunks.push(chunk),
+			onEvent: (event) => options.events.push(event.eventType),
+		});
+	}
+
+	it("flush terminates when an unordered stream ends mid-value, preserving the partial text", () => {
+		const chunks: string[] = [];
+		const events: string[] = [];
+		const extractor = makeExtractor({ unordered: true, chunks, events });
+
+		for (const token of ["{", '"replyText"', ":", '"', "He", "l"]) {
+			extractor.push(token);
+		}
+		expect(chunks.join("")).toBe("Hel");
+
+		extractor.flush();
+
+		// Every received byte was delivered; flush() returned instead of spinning.
+		expect(chunks.join("")).toBe("Hel");
+		expect(extractor.done).toBe(true);
+		expect(events).toContain("complete");
+	});
+
+	it("flush preserves a trailing lone backslash verbatim", () => {
+		const chunks: string[] = [];
+		const events: string[] = [];
+		const extractor = makeExtractor({ unordered: true, chunks, events });
+
+		extractor.push('{"replyText":"Hel\\');
+		extractor.flush();
+
+		expect(chunks.join("")).toBe("Hel\\");
+		expect(extractor.done).toBe(true);
+		expect(events).toContain("complete");
+	});
+
+	it("flush preserves a partial \\u escape's raw characters verbatim", () => {
+		const chunks: string[] = [];
+		const events: string[] = [];
+		const extractor = makeExtractor({ unordered: true, chunks, events });
+
+		extractor.push('{"replyText":"Hel\\u00');
+		extractor.flush();
+
+		expect(chunks.join("")).toBe("Hel\\u00");
+		expect(extractor.done).toBe(true);
+		expect(events).toContain("complete");
+	});
+
+	it("flush terminates in ordered mode when the stream is cut inside the key", () => {
+		const chunks: string[] = [];
+		const events: string[] = [];
+		const extractor = makeExtractor({ unordered: false, chunks, events });
+
+		extractor.push("{");
+		extractor.push('"replyTex');
+
+		extractor.flush();
+
+		expect(extractor.done).toBe(true);
+		expect(events).toContain("complete");
+	});
+
+	it("flush terminates in ordered mode when the stream ends mid-value after the key", () => {
+		const chunks: string[] = [];
+		const events: string[] = [];
+		const extractor = makeExtractor({ unordered: false, chunks, events });
+
+		extractor.push('{"replyText":"Hel');
+		extractor.flush();
+
+		expect(chunks.join("")).toBe("Hel");
+		expect(extractor.done).toBe(true);
+		expect(events).toContain("complete");
+	});
+
+	it("previously-completing streams are unchanged by truncated-flush termination", () => {
+		// Over-rejection corpus: every input shape that completed before the
+		// fix must still produce byte-identical output afterwards.
+		const corpus: Array<{ name: string; tokens: string[]; want: string }> = [
+			{
+				name: "complete envelope",
+				tokens: [
+					'{"shouldRespond":"RESPOND","contexts":[],"intents":[],',
+					'"replyText":"Hello ',
+					'there","facts":[]}',
+				],
+				want: "Hello there",
+			},
+			{
+				name: "escapes decoded",
+				tokens: ['{"replyText":"Line 1\\nLine 2 \\u2728"}'],
+				want: "Line 1\nLine 2 ✨",
+			},
+			{
+				name: "think tags hidden",
+				tokens: ['{"replyText":"a <thi', 'nk>secret</think>b"}'],
+				want: "a b",
+			},
+			{
+				name: "trailing tag-like prefix kept visible",
+				tokens: ['{"replyText":"literal <thi"}'],
+				want: "literal <thi",
+			},
+			{
+				name: "prose passthrough",
+				tokens: ["just plain ", "prose"],
+				want: "just plain prose",
+			},
+		];
+		for (const { name, tokens, want } of corpus) {
+			const unorderedChunks: string[] = [];
+			const unorderedEvents: string[] = [];
+			const unordered = makeExtractor({
+				unordered: true,
+				chunks: unorderedChunks,
+				events: unorderedEvents,
+			});
+			for (const token of tokens) unordered.push(token);
+			unordered.flush();
+			expect(unorderedChunks.join(""), `unordered ${name} chunks`).toBe(want);
+			expect(unorderedEvents).toContain("complete");
+
+			const orderedChunks: string[] = [];
+			const orderedEvents: string[] = [];
+			const ordered = makeExtractor({
+				unordered: false,
+				chunks: orderedChunks,
+				events: orderedEvents,
+			});
+			for (const token of tokens) ordered.push(token);
+			ordered.flush();
+			if (want !== "just plain prose") {
+				// Prose never matches skeleton spans on the structured path; the
+				// passthrough decision is format-driven and mode-independent, so
+				// this corpus row only asserts the envelope shapes here.
+				expect(orderedChunks.join(""), `ordered ${name} chunks`).toBe(want);
+			}
+			expect(orderedEvents).toContain("complete");
+		}
 	});
 });
