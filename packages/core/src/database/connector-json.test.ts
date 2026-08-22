@@ -3,7 +3,7 @@
  * bounded production exports before storage adapters persist or audit data.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
 	CONNECTOR_JSON_BOUNDED,
 	CONNECTOR_JSON_UNBOUNDED,
@@ -51,6 +51,65 @@ describe("connector JSON projection", () => {
 				expect.objectContaining({ code: CONNECTOR_JSON_UNBOUNDED }),
 			);
 		}
+	});
+
+	it("rejects impossible-size strings before allocating their UTF-8 encoding", () => {
+		const oversized = "a".repeat(MAX_CONNECTOR_JSON_STRING_BYTES + 1);
+		const encode = vi.spyOn(TextEncoder.prototype, "encode");
+
+		try {
+			expect(() => cloneConnectorJsonValue(oversized)).toThrowError(
+				expect.objectContaining({ code: CONNECTOR_JSON_UNBOUNDED }),
+			);
+			expect(encode.mock.calls.some(([value]) => value === oversized)).toBe(
+				false,
+			);
+
+			encode.mockClear();
+			expect(() =>
+				cloneConnectorJsonObject({ [oversized]: true }),
+			).toThrowError(
+				expect.objectContaining({ code: CONNECTOR_JSON_UNBOUNDED }),
+			);
+			expect(encode.mock.calls.some(([value]) => value === oversized)).toBe(
+				false,
+			);
+
+			encode.mockClear();
+			expect(
+				redactConnectorJsonAudit({ value: oversized }, () => false),
+			).toEqual({ value: CONNECTOR_JSON_BOUNDED });
+			expect(encode.mock.calls.some(([value]) => value === oversized)).toBe(
+				false,
+			);
+
+			encode.mockClear();
+			const redactedKey = redactConnectorJsonAudit(
+				{ [oversized]: true },
+				() => false,
+			);
+			expect(
+				Object.getOwnPropertyDescriptor(redactedKey, oversized)?.value,
+			).toBe(CONNECTOR_JSON_BOUNDED);
+			expect(encode.mock.calls.some(([value]) => value === oversized)).toBe(
+				false,
+			);
+		} finally {
+			encode.mockRestore();
+		}
+	});
+
+	it("preserves exact accepted strings at the UTF-8 byte boundary", () => {
+		const ascii = "a".repeat(MAX_CONNECTOR_JSON_STRING_BYTES);
+		const fourByte = "😀".repeat(MAX_CONNECTOR_JSON_STRING_BYTES / 4);
+		const value = { ascii, fourByte };
+
+		expect(cloneConnectorJsonObject(value)).toEqual(value);
+		expect(cloneConnectorJsonValue([ascii, fourByte])).toEqual([
+			ascii,
+			fourByte,
+		]);
+		expect(redactConnectorJsonAudit(value, () => false)).toEqual(value);
 	});
 
 	it("rejects every non-JSON primitive without normalizing values", () => {

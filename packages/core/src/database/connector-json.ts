@@ -84,6 +84,13 @@ function chargeText(
 	options: WalkOptions,
 	kind: "keyBytes" | "stringBytes",
 ): BoundedResult | undefined {
+	if (value.length > MAX_CONNECTOR_JSON_STRING_BYTES) {
+		return overflow(options, "leaf", {
+			field: kind,
+			minimumBytes: value.length,
+			maxBytes: MAX_CONNECTOR_JSON_STRING_BYTES,
+		});
+	}
 	const bytes = utf8Encoder.encode(value).byteLength;
 	if (bytes > MAX_CONNECTOR_JSON_STRING_BYTES) {
 		return overflow(options, "leaf", { [kind]: bytes });

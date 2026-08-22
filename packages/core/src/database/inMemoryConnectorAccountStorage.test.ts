@@ -3,11 +3,12 @@
  * the real `InMemoryDatabaseAdapter`: account upsert/get/list, credential refs,
  * audit-event secret redaction, and OAuth flow-state create/consume/update/delete.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { IDatabaseAdapter, UUID } from "../types";
 import {
 	CONNECTOR_JSON_UNBOUNDED,
 	MAX_CONNECTOR_JSON_NODES,
+	MAX_CONNECTOR_JSON_STRING_BYTES,
 } from "./connector-json";
 import { InMemoryDatabaseAdapter } from "./inMemoryAdapter";
 
@@ -384,6 +385,34 @@ describe("InMemoryDatabaseAdapter connector JSON bounds", () => {
 			profile: { wide } as never,
 		});
 		expect(descriptorCalls).toBe(0);
+	});
+
+	it("rejects an oversized profile string before encoding or persistence", async () => {
+		const adapter = new InMemoryDatabaseAdapter();
+		await adapter.initialize();
+		const oversized = "a".repeat(MAX_CONNECTOR_JSON_STRING_BYTES + 1);
+		const encode = vi.spyOn(TextEncoder.prototype, "encode");
+
+		try {
+			await expectUpsertRejects(adapter, {
+				agentId,
+				provider: "github",
+				accountKey: "github-oversized-string",
+				profile: { oversized },
+			});
+			expect(encode.mock.calls.some(([value]) => value === oversized)).toBe(
+				false,
+			);
+			await expect(
+				adapter.getConnectorAccount({
+					agentId,
+					provider: "github",
+					accountKey: "github-oversized-string",
+				}),
+			).resolves.toBeNull();
+		} finally {
+			encode.mockRestore();
+		}
 	});
 
 	it("records a bounded audit event for hostile metadata instead of throwing", async () => {
