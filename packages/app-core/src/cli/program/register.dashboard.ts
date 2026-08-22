@@ -4,10 +4,64 @@
  * server and opens that URL; failing that it locates the eliza package root,
  * spawns the app's Vite dev server, and opens the dev URL once Vite reports
  * "Local:" (or after a timeout). Cross-platform browser launch and dev-server
- * teardown (including a Windows taskkill tree-kill) are handled here.
+ * teardown are handled here: on Windows via `taskkill /t`, on POSIX by killing
+ * the child's whole process group (the child is spawned detached as a group
+ * leader) so the Vite grandchild cannot survive the CLI's exit.
  */
+
+import type { ChildProcess, ChildProcessByStdio } from "node:child_process";
+import * as childProcess from "node:child_process";
+import type { Readable } from "node:stream";
 import { resolveDesktopUiPort, theme } from "@elizaos/shared";
 import type { Command } from "commander";
+
+const SIGKILL_ESCALATION_MS = 5_000;
+
+/**
+ * Spawn the app dev server as a process-group leader on POSIX (detached), so
+ * `stopDashboardDevServer` can signal the whole `bun run dev` tree — Vite runs
+ * as a grandchild and does not receive a signal aimed at the direct child
+ * alone. Windows keeps default group semantics; taskkill /t handles the tree.
+ */
+export function spawnDashboardDevServer(
+  appDir: string,
+): ChildProcessByStdio<null, Readable, Readable> {
+  return childProcess.spawn("bun", ["run", "dev"], {
+    cwd: appDir,
+    stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env },
+    detached: process.platform !== "win32",
+  });
+}
+
+/**
+ * Tear down the spawned dev server and everything under it. On POSIX the
+ * child was started as a group leader, so signal the whole group; escalate to
+ * SIGKILL if SIGTERM has not ended it within {@link SIGKILL_ESCALATION_MS}.
+ * Windows already tree-kills through `taskkill /t /f`.
+ */
+export function stopDashboardDevServer(child: ChildProcess): void {
+  const pid = child.pid;
+  if (!pid) return;
+  if (process.platform === "win32") {
+    childProcess.spawnSync("taskkill", ["/pid", String(pid), "/t", "/f"]);
+    return;
+  }
+  try {
+    process.kill(-pid, "SIGTERM");
+  } catch {
+    // error-policy:J6 best-effort teardown: ESRCH means the group is already gone.
+  }
+  const escalation = setTimeout(() => {
+    try {
+      process.kill(-pid, "SIGKILL");
+    } catch {
+      // error-policy:J6 best-effort teardown: group already reaped.
+    }
+  }, SIGKILL_ESCALATION_MS);
+  escalation.unref?.();
+  child.once("exit", () => clearTimeout(escalation));
+}
 
 async function isPortListening(
   port: number,
@@ -129,12 +183,7 @@ export function registerDashboardCommand(program: Command) {
         return;
       }
 
-      const { spawn, spawnSync } = await import("node:child_process");
-      const child = spawn("bun", ["run", "dev"], {
-        cwd: appDir,
-        stdio: ["ignore", "pipe", "pipe"],
-        env: { ...process.env },
-      });
+      const child = spawnDashboardDevServer(appDir);
 
       let opened = false;
 
@@ -168,12 +217,7 @@ export function registerDashboardCommand(program: Command) {
       setTimeout(tryOpen, 10_000);
 
       const cleanup = () => {
-        if (process.platform === "win32" && child.pid) {
-          // Windows does not propagate SIGTERM through Bun's child tree.
-          spawnSync("taskkill", ["/pid", String(child.pid), "/t", "/f"]);
-          return;
-        }
-        child.kill("SIGTERM");
+        stopDashboardDevServer(child);
       };
       process.on("SIGINT", cleanup);
       process.on("SIGTERM", cleanup);
