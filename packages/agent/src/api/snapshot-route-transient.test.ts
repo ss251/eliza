@@ -8,9 +8,10 @@
  */
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import http from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { AgentRuntime, InMemoryDatabaseAdapter } from "@elizaos/core";
+import { AgentRuntime, InMemoryDatabaseAdapter, logger } from "@elizaos/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   PGLITE_SNAPSHOT_UNAVAILABLE_TRANSIENT,
@@ -134,7 +135,12 @@ async function withSnapshotServer(
       await runtime.stop({ fast: true });
       await runtime.close();
     }
-    await rm(root, { recursive: true, force: true });
+    await rm(root, {
+      recursive: true,
+      force: true,
+      maxRetries: 5,
+      retryDelay: 20,
+    });
   }
 }
 
@@ -155,6 +161,43 @@ afterEach(() => {
 });
 
 describe("POST /api/snapshot transient/terminal mapping", () => {
+  it("classifies an ordinary response error as a warn-level transport abort", async () => {
+    const transportError = Object.assign(new Error("write EPIPE"), {
+      code: "EPIPE",
+    });
+    const originalWrite = http.ServerResponse.prototype.write;
+    const write = vi
+      .spyOn(http.ServerResponse.prototype, "write")
+      .mockImplementation(function (this: http.ServerResponse, ...args) {
+        const accepted = Reflect.apply(originalWrite, this, args) as boolean;
+        this.emit("error", transportError);
+        this.destroy();
+        return accepted;
+      });
+    const warn = vi.spyOn(logger, "warn").mockImplementation(() => undefined);
+    const logError = vi
+      .spyOn(logger, "error")
+      .mockImplementation(() => undefined);
+
+    await withSnapshotServer(
+      async () => new Blob([], { type: "application/gzip" }),
+      async (baseUrl) => {
+        const response = await postSnapshot(baseUrl).catch(() => null);
+        await response?.body?.cancel();
+      },
+    );
+
+    expect(write).toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(String) }),
+      "[agent-backup] Snapshot download aborted",
+    );
+    expect(logError).not.toHaveBeenCalledWith(
+      expect.anything(),
+      "[agent-backup] Snapshot failed",
+    );
+  }, 120_000);
+
   it("maps a PGlite closing race to 503 with the structured transient code", async () => {
     await withSnapshotServer(
       async () => {

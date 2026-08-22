@@ -27,6 +27,33 @@ export class AgentBackupClientDisconnectedError extends ElizaError {
   }
 }
 
+function clientDisconnectedError(
+  message: string,
+  cause?: unknown,
+): AgentBackupClientDisconnectedError {
+  return cause instanceof AgentBackupClientDisconnectedError
+    ? cause
+    : new AgentBackupClientDisconnectedError(message, { cause });
+}
+
+function closedResponseError(): AgentBackupClientDisconnectedError {
+  return new AgentBackupClientDisconnectedError(
+    "Agent backup response transport closed mid-stream",
+  );
+}
+
+function responseIsClosed(res: http.ServerResponse): boolean {
+  return res.destroyed || res.closed;
+}
+
+function assertResponseWritable(
+  res: http.ServerResponse,
+  streamFailure?: AgentBackupClientDisconnectedError,
+): void {
+  if (streamFailure) throw streamFailure;
+  if (responseIsClosed(res)) throw closedResponseError();
+}
+
 function isUnsupportedJsonValue(value: unknown): boolean {
   return (
     value === undefined ||
@@ -130,7 +157,13 @@ async function* encodeJsonValue(
  * a backpressure wait that will never complete (the v2 capture writer in
  * backup-v2-stream-response.ts applies the same close/error racing).
  */
-function waitForDrain(res: http.ServerResponse): Promise<void> {
+function waitForDrain(
+  res: http.ServerResponse,
+  getStreamFailure: () => AgentBackupClientDisconnectedError | undefined,
+): Promise<void> {
+  const failure = getStreamFailure();
+  if (failure) return Promise.reject(failure);
+  if (responseIsClosed(res)) return Promise.reject(closedResponseError());
   return new Promise<void>((resolve, reject) => {
     const cleanup = (): void => {
       res.off("drain", onDrain);
@@ -139,7 +172,10 @@ function waitForDrain(res: http.ServerResponse): Promise<void> {
     };
     const onDrain = (): void => {
       cleanup();
-      resolve();
+      const drainFailure = getStreamFailure();
+      if (drainFailure) reject(drainFailure);
+      else if (responseIsClosed(res)) reject(closedResponseError());
+      else resolve();
     };
     const onClose = (): void => {
       cleanup();
@@ -152,14 +188,22 @@ function waitForDrain(res: http.ServerResponse): Promise<void> {
     const onError = (error: unknown): void => {
       cleanup();
       reject(
-        error instanceof Error
-          ? error
-          : new Error("Agent backup response stream failed", { cause: error }),
+        clientDisconnectedError(
+          "Agent backup response transport failed while backpressured",
+          error,
+        ),
       );
     };
     res.once("drain", onDrain);
     res.once("close", onClose);
     res.once("error", onError);
+    const subscribedFailure = getStreamFailure();
+    if (subscribedFailure) {
+      cleanup();
+      reject(subscribedFailure);
+    } else if (responseIsClosed(res)) {
+      onClose();
+    }
   });
 }
 
@@ -173,26 +217,28 @@ export async function writeAgentBackupJsonResponse(
   // Capture transport errors raised outside the drain wait (a write can emit
   // "error" asynchronously between chunks) instead of letting them surface as
   // an unhandled stream event; the loop checks the capture after every write.
-  let streamError: unknown;
+  let streamFailure: AgentBackupClientDisconnectedError | undefined;
   const captureStreamError = (error: unknown): void => {
-    streamError ??=
-      error instanceof Error
-        ? error
-        : new Error("Agent backup response stream failed", { cause: error });
+    streamFailure ??= clientDisconnectedError(
+      "Agent backup response transport failed mid-stream",
+      error,
+    );
+  };
+  const captureStreamClose = (): void => {
+    streamFailure ??= closedResponseError();
   };
   res.on("error", captureStreamError);
+  res.on("close", captureStreamClose);
   try {
     for await (const chunk of encodeJsonValue(snapshot, new Set())) {
-      if (!res.write(chunk)) await waitForDrain(res);
-      if (streamError) throw streamError;
-      if (res.destroyed) {
-        throw new AgentBackupClientDisconnectedError(
-          "Agent backup response transport closed mid-stream",
-        );
-      }
+      assertResponseWritable(res, streamFailure);
+      if (!res.write(chunk)) await waitForDrain(res, () => streamFailure);
+      assertResponseWritable(res, streamFailure);
     }
+    assertResponseWritable(res, streamFailure);
+    res.end();
   } finally {
     res.off("error", captureStreamError);
+    res.off("close", captureStreamClose);
   }
-  res.end();
 }

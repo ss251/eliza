@@ -1911,10 +1911,7 @@ async function handleRequest(
       await writeAgentBackupJsonResponse(res, snapshot);
     } catch (err) {
       const message = formatError(err);
-      if (
-        err instanceof AgentBackupClientDisconnectedError ||
-        message === "Agent backup response stream failed"
-      ) {
+      if (err instanceof AgentBackupClientDisconnectedError) {
         // The download transport died mid-stream (client abort or socket
         // error). The response is already committed and the socket is gone;
         // treat it like the v2 capture boundary's 499/ephemeral path rather
