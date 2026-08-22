@@ -567,6 +567,7 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
   protected readonly databaseBackend: DatabaseBackend = "unknown";
   protected migrationService?: DatabaseMigrationService;
   private migrationRunPromise: Promise<void> | null = null;
+  private embeddingDimensionOperationTail: Promise<void> = Promise.resolve();
   private readonly migratedSchemaEntries = new Map<string, Map<string, unknown>>();
   private _connectorAccountStore?: ConnectorAccountStore;
   private messageSearchTrigramAvailable: boolean | null = null;
@@ -593,6 +594,20 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
   }
 
   protected abstract withDatabase<T>(operation: () => Promise<T>): Promise<T>;
+
+  private async withEmbeddingDimensionConsistency<T>(operation: () => Promise<T>): Promise<T> {
+    const previous = this.embeddingDimensionOperationTail;
+    let release: (() => void) | undefined;
+    this.embeddingDimensionOperationTail = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previous;
+    try {
+      return await operation();
+    } finally {
+      release?.();
+    }
+  }
 
   public abstract withEntityContext<T>(
     entityId: UUID | null,
@@ -814,23 +829,30 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
    * @returns {Promise<void>} - Resolves once the embedding dimension is ensured.
    */
   async ensureEmbeddingDimension(dimension: number) {
+    return this.withEmbeddingDimensionConsistency(() =>
+      this.ensureEmbeddingDimensionWithExclusiveWriteAccess(dimension)
+    );
+  }
+
+  private async ensureEmbeddingDimensionWithExclusiveWriteAccess(dimension: number) {
     return this.withDatabase(async () => {
       const resolvedDimension = DIMENSION_MAP[dimension as keyof typeof DIMENSION_MAP];
       if (!resolvedDimension) {
-        logger.warn(
-          {
-            src: "plugin:sql",
-            agentId: this.agentId,
+        throw new ElizaError(`Embedding dimension ${dimension} is not supported`, {
+          code: "EMBEDDING_DIMENSION_UNSUPPORTED",
+          severity: "fatal",
+          context: {
             requestedDimension: dimension,
-            fallbackDimension: this.embeddingDimension,
+            activeDimension: Number(this.embeddingDimension.slice("dim".length)),
           },
-          "Unsupported embedding dimension requested; keeping current embedding column"
-        );
-        return;
+        });
       }
 
-      this.embeddingDimension = resolvedDimension;
       await this.ensureEmbeddingVectorIndex(dimension);
+      // Commit the active write column only after every fallible migration step
+      // has completed. Runtime pins its provider/width after this method returns,
+      // so adapter and runtime transition atomically from the caller's view.
+      this.embeddingDimension = resolvedDimension;
     });
   }
 
@@ -3891,7 +3913,22 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
     memory: Memory & { metadata?: MemoryMetadata },
     tableName: string
   ): Promise<UUID> {
+    if (memory.embedding === undefined) {
+      return this.createMemoryWithCurrentEmbeddingDimension(memory, tableName);
+    }
+    return this.withEmbeddingDimensionConsistency(() =>
+      this.createMemoryWithCurrentEmbeddingDimension(memory, tableName)
+    );
+  }
+
+  private async createMemoryWithCurrentEmbeddingDimension(
+    memory: Memory & { metadata?: MemoryMetadata },
+    tableName: string
+  ): Promise<UUID> {
     const memoryId = memory.id ?? (v4() as UUID);
+    if (memory.embedding !== undefined) {
+      this.validateMemoryEmbeddingForWrite(memory.embedding, { memoryId, tableName });
+    }
 
     await this.resolveMemoryUniqueness(memory, tableName);
 
@@ -3927,22 +3964,58 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
     }
   }
 
+  private validateMemoryEmbeddingForWrite(
+    embedding: unknown,
+    context: { memoryId?: UUID; tableName?: string; batchIndex?: number }
+  ): { column: EmbeddingDimensionColumn; vector: number[] } {
+    const column = this.embeddingDimension;
+    const expectedDimension = Number(column.replace(/^dim/, ""));
+    if (!Array.isArray(embedding)) {
+      throw new ElizaError("Memory embedding must be an array", {
+        code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+        context: { ...context, outputKind: typeof embedding },
+        severity: "fatal",
+      });
+    }
+    if (embedding.length !== expectedDimension) {
+      throw new ElizaError(
+        `Memory embedding dimension ${embedding.length} does not match active dimension ${expectedDimension}`,
+        {
+          code: "EMBEDDING_DIMENSION_MISMATCH",
+          context: {
+            ...context,
+            expectedDimension,
+            actualDimension: embedding.length,
+            column,
+          },
+          severity: "fatal",
+        }
+      );
+    }
+    const valueIndex = embedding.findIndex(
+      (value) => typeof value !== "number" || !Number.isFinite(value)
+    );
+    if (valueIndex !== -1) {
+      throw new ElizaError("Memory embedding contains a non-finite value", {
+        code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+        context: { ...context, valueIndex, column },
+        severity: "fatal",
+      });
+    }
+    return { column, vector: embedding as number[] };
+  }
+
   private validateMemoryBatchEmbeddings(
     memories: Array<{ memory: Memory; tableName: string }>
   ): void {
-    const expectedDimension = Number(this.embeddingDimension.replace(/^dim/, ""));
     for (let index = 0; index < memories.length; index++) {
       const { memory, tableName } = memories[index];
-      if (!memory.embedding) continue;
-      if (
-        !Array.isArray(memory.embedding) ||
-        memory.embedding.length !== expectedDimension ||
-        memory.embedding.some((value) => !Number.isFinite(value))
-      ) {
-        throw new Error(
-          `Invalid embedding in atomic memory batch at index ${index} (${tableName}); expected ${expectedDimension} finite values`
-        );
-      }
+      if (memory.embedding === undefined) continue;
+      this.validateMemoryEmbeddingForWrite(memory.embedding, {
+        memoryId: memory.id,
+        tableName,
+        batchIndex: index,
+      });
     }
   }
 
@@ -3953,6 +4026,10 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
     memoryId: UUID,
     requireInserted = false
   ): Promise<void> {
+    const validatedEmbedding =
+      memory.embedding === undefined
+        ? undefined
+        : this.validateMemoryEmbeddingForWrite(memory.embedding, { memoryId, tableName });
     // Ensure we always pass a JSON string to the SQL bind parameter; if we pass an
     // object directly PG sees `[object Object]` and fails the `::jsonb` cast.
     const contentToInsert =
@@ -3990,40 +4067,16 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
       return;
     }
 
-    if (memory.embedding && Array.isArray(memory.embedding)) {
-      const expectedDimension = Number(this.embeddingDimension.replace(/^dim/, ""));
-      if (memory.embedding.length !== expectedDimension) {
-        // The runtime's TEXT_EMBEDDING provider returned a vector whose width
-        // does not match the column this agent is configured to write to —
-        // typically because a fallback provider (e.g. cloud at 1536 dims) ran
-        // before the configured local model finished warmup. Persist the
-        // memory itself; skip the embedding so a later write with the right
-        // model can supply one.
-        logger.warn(
-          {
-            src: "plugin:sql",
-            agentId: this.agentId,
-            expectedDimension,
-            receivedDimension: memory.embedding.length,
-            column: this.embeddingDimension,
-          },
-          "Skipping embedding insert: dimension mismatch with configured column"
-        );
-      } else {
-        const embeddingValues: Record<string, unknown> = {
-          id: v4(),
-          memoryId: memoryId,
-          createdAt: memory.createdAt !== undefined ? new Date(memory.createdAt) : new Date(),
-        };
+    if (validatedEmbedding) {
+      const embeddingValues: Record<string, unknown> = {
+        id: v4(),
+        memoryId: memoryId,
+        createdAt: memory.createdAt !== undefined ? new Date(memory.createdAt) : new Date(),
+      };
 
-        const cleanVector = memory.embedding.map((n) =>
-          Number.isFinite(n) ? Number(n.toFixed(6)) : 0
-        );
+      embeddingValues[validatedEmbedding.column] = validatedEmbedding.vector;
 
-        embeddingValues[this.embeddingDimension] = cleanVector;
-
-        await tx.insert(embeddingTable).values([embeddingValues]);
-      }
+      await tx.insert(embeddingTable).values([embeddingValues]);
     }
   }
 
@@ -4035,7 +4088,22 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
   async updateMemory(
     memory: Partial<Memory> & { id: UUID; metadata?: MemoryMetadata }
   ): Promise<boolean> {
+    if (memory.embedding === undefined) {
+      return this.updateMemoryWithCurrentEmbeddingDimension(memory);
+    }
+    return this.withEmbeddingDimensionConsistency(() =>
+      this.updateMemoryWithCurrentEmbeddingDimension(memory)
+    );
+  }
+
+  private async updateMemoryWithCurrentEmbeddingDimension(
+    memory: Partial<Memory> & { id: UUID; metadata?: MemoryMetadata }
+  ): Promise<boolean> {
     return this.withDatabase(async () => {
+      const validatedEmbedding =
+        memory.embedding === undefined
+          ? undefined
+          : this.validateMemoryEmbeddingForWrite(memory.embedding, { memoryId: memory.id });
       try {
         await this.db.transaction(async (tx) => {
           // Update memory content if provided
@@ -4073,57 +4141,45 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
           }
 
           // Update embedding if provided
-          if (memory.embedding && Array.isArray(memory.embedding)) {
-            const expectedDimension = Number(this.embeddingDimension.replace(/^dim/, ""));
-            if (memory.embedding.length !== expectedDimension) {
-              logger.warn(
-                {
-                  src: "plugin:sql",
-                  agentId: this.agentId,
-                  memoryId: memory.id,
-                  expectedDimension,
-                  receivedDimension: memory.embedding.length,
-                  column: this.embeddingDimension,
-                },
-                "Skipping embedding update: dimension mismatch with configured column"
-              );
+          if (validatedEmbedding) {
+            // Check if embedding exists
+            const existingEmbedding = await tx
+              .select({ id: embeddingTable.id })
+              .from(embeddingTable)
+              .where(eq(embeddingTable.memoryId, memory.id))
+              .limit(1);
+
+            if (existingEmbedding.length > 0) {
+              // Update existing embedding
+              const updateValues: Record<string, unknown> = {};
+              updateValues[validatedEmbedding.column] = validatedEmbedding.vector;
+
+              await tx
+                .update(embeddingTable)
+                .set(updateValues)
+                .where(eq(embeddingTable.memoryId, memory.id));
             } else {
-              const cleanVector = memory.embedding.map((n) =>
-                Number.isFinite(n) ? Number(n.toFixed(6)) : 0
-              );
+              // Create new embedding
+              const embeddingValues: Record<string, unknown> = {
+                id: v4(),
+                memoryId: memory.id,
+              };
+              embeddingValues[validatedEmbedding.column] = validatedEmbedding.vector;
 
-              // Check if embedding exists
-              const existingEmbedding = await tx
-                .select({ id: embeddingTable.id })
-                .from(embeddingTable)
-                .where(eq(embeddingTable.memoryId, memory.id))
-                .limit(1);
-
-              if (existingEmbedding.length > 0) {
-                // Update existing embedding
-                const updateValues: Record<string, unknown> = {};
-                updateValues[this.embeddingDimension] = cleanVector;
-
-                await tx
-                  .update(embeddingTable)
-                  .set(updateValues)
-                  .where(eq(embeddingTable.memoryId, memory.id));
-              } else {
-                // Create new embedding
-                const embeddingValues: Record<string, unknown> = {
-                  id: v4(),
-                  memoryId: memory.id,
-                };
-                embeddingValues[this.embeddingDimension] = cleanVector;
-
-                await tx.insert(embeddingTable).values([embeddingValues]);
-              }
+              await tx.insert(embeddingTable).values([embeddingValues]);
             }
           }
         });
 
         return true;
       } catch (error) {
+        if (
+          error instanceof ElizaError &&
+          (error.code === "EMBEDDING_DIMENSION_MISMATCH" ||
+            error.code === "EMBEDDING_MODEL_OUTPUT_INVALID")
+        ) {
+          throw error;
+        }
         // error-policy:J2 context-adding rethrow — a failed memory update must
         // not read as a benign false; surface the write failure.
         throw new ElizaError("updateMemory failed", {
@@ -6757,6 +6813,17 @@ export abstract class BaseDrizzleAdapter extends DatabaseAdapter<DrizzleDatabase
   ): Promise<UUID[]> {
     if (memories.length === 0) return [];
 
+    if (!memories.some(({ memory }) => memory.embedding !== undefined)) {
+      return this.createMemoriesWithCurrentEmbeddingDimension(memories);
+    }
+    return this.withEmbeddingDimensionConsistency(() =>
+      this.createMemoriesWithCurrentEmbeddingDimension(memories)
+    );
+  }
+
+  private async createMemoriesWithCurrentEmbeddingDimension(
+    memories: Array<{ memory: Memory; tableName: string; unique?: boolean }>
+  ): Promise<UUID[]> {
     this.validateMemoryBatchEmbeddings(memories);
 
     const entityContexts = new Set(memories.map(({ memory }) => memory.entityId ?? null));

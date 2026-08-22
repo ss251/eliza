@@ -641,6 +641,9 @@ const LOCAL_EMBEDDING_PROVIDERS = new Set([
 	"eliza-aosp-llama",
 ]);
 
+/** Unexported capability passed only by ensureEmbeddingDimension's probe call. */
+const EMBEDDING_DIMENSION_PROBE_CALL = Symbol("embedding-dimension-probe");
+
 /**
  * Thrown by `AgentRuntime.ensureEmbeddingDimension` when EVERY registered
  * TEXT_EMBEDDING provider failed the null dimension probe. Carries the
@@ -1333,6 +1336,15 @@ export class AgentRuntime implements IAgentRuntime {
 	 * mismatch (#8769). Re-set on every successful `ensureEmbeddingDimension`.
 	 */
 	private pinnedEmbeddingProvider: string | undefined;
+	/**
+	 * Vector width established by the successful TEXT_EMBEDDING boot probe.
+	 * Provider identity alone is insufficient: one provider can change models or
+	 * return a different width from its batch handler. Every later embedding
+	 * result is checked against this value before hooks or callers can persist it.
+	 */
+	private pinnedEmbeddingDimension: number | undefined;
+	/** Single-flight barrier for probe, adapter migration, cleanup, and pin commit. */
+	private embeddingDimensionMigration: Promise<void> | undefined;
 	/**
 	 * The provider name that actually served the most recent successful
 	 * `useModel` call for each model type key. Populated the moment a
@@ -6538,10 +6550,128 @@ export class AgentRuntime implements IAgentRuntime {
 			});
 	}
 
+	private validateEmbeddingModelOutput(
+		modelType: string,
+		provider: string,
+		result: unknown,
+		params: unknown,
+		skipPinnedDimensionCheck: boolean,
+	): void {
+		if (
+			modelType !== ModelType.TEXT_EMBEDDING &&
+			modelType !== ModelType.TEXT_EMBEDDING_BATCH
+		) {
+			return;
+		}
+		const expectedDimension = skipPinnedDimensionCheck
+			? undefined
+			: this.pinnedEmbeddingDimension;
+
+		const vectors =
+			modelType === ModelType.TEXT_EMBEDDING_BATCH ? result : [result];
+		if (!Array.isArray(vectors)) {
+			throw new ElizaError(
+				`${modelType} provider "${provider}" returned a non-array result`,
+				{
+					code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+					context: { modelType, provider, outputKind: typeof result },
+					severity: "fatal",
+				},
+			);
+		}
+		if (
+			modelType === ModelType.TEXT_EMBEDDING_BATCH &&
+			isPlainObject(params) &&
+			Array.isArray(params.texts) &&
+			vectors.length !== params.texts.length
+		) {
+			throw new ElizaError(
+				`${modelType} provider "${provider}" returned ${vectors.length} vectors for ${params.texts.length} inputs`,
+				{
+					code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+					context: {
+						modelType,
+						provider,
+						expectedCount: params.texts.length,
+						actualCount: vectors.length,
+					},
+					severity: "fatal",
+				},
+			);
+		}
+
+		for (const [vectorIndex, vector] of vectors.entries()) {
+			if (!Array.isArray(vector)) {
+				throw new ElizaError(
+					`${modelType} provider "${provider}" returned a non-array vector`,
+					{
+						code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+						context: {
+							modelType,
+							provider,
+							...(modelType === ModelType.TEXT_EMBEDDING_BATCH
+								? { vectorIndex }
+								: {}),
+							outputKind: typeof vector,
+						},
+						severity: "fatal",
+					},
+				);
+			}
+			if (
+				expectedDimension !== undefined &&
+				vector.length !== expectedDimension
+			) {
+				throw new ElizaError(
+					`${modelType} provider "${provider}" returned dimension ${vector.length}; expected ${expectedDimension}`,
+					{
+						code: "EMBEDDING_DIMENSION_MISMATCH",
+						context: {
+							modelType,
+							provider,
+							expectedDimension,
+							actualDimension: vector.length,
+							...(modelType === ModelType.TEXT_EMBEDDING_BATCH
+								? { vectorIndex }
+								: {}),
+						},
+						severity: "fatal",
+					},
+				);
+			}
+			const invalidValueIndex = vector.findIndex(
+				(value) => typeof value !== "number" || !Number.isFinite(value),
+			);
+			if (invalidValueIndex !== -1) {
+				const invalidValue = vector[invalidValueIndex];
+				throw new ElizaError(
+					`${modelType} provider "${provider}" returned a non-finite numeric vector element`,
+					{
+						code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+						context: {
+							modelType,
+							provider,
+							...(modelType === ModelType.TEXT_EMBEDDING_BATCH
+								? { vectorIndex }
+								: {}),
+							valueIndex: invalidValueIndex,
+							outputKind:
+								typeof invalidValue === "number"
+									? "non-finite-number"
+									: typeof invalidValue,
+						},
+						severity: "fatal",
+					},
+				);
+			}
+		}
+	}
+
 	async useModel<T extends keyof ModelParamsMap, R = ModelResultMap[T]>(
 		modelType: T,
 		params: ModelParamsMap[T],
 		provider?: string,
+		internalCall?: typeof EMBEDDING_DIMENSION_PROBE_CALL,
 	): Promise<R> {
 		const useModelStartedAt = Date.now();
 		this.assertCanonicalModelCapabilityEnabled(String(modelType));
@@ -6648,6 +6778,16 @@ export class AgentRuntime implements IAgentRuntime {
 					requestedModelKey = overrideModelKey as typeof requestedModelKey;
 				}
 			}
+		}
+
+		const dimensionMigration = this.embeddingDimensionMigration;
+		if (
+			internalCall !== EMBEDDING_DIMENSION_PROBE_CALL &&
+			dimensionMigration !== undefined &&
+			(requestedModelKey === ModelType.TEXT_EMBEDDING ||
+				requestedModelKey === ModelType.TEXT_EMBEDDING_BATCH)
+		) {
+			await dimensionMigration;
 		}
 
 		// TEXT_EMBEDDING and TEXT_EMBEDDING_BATCH calls without an explicit
@@ -7310,6 +7450,13 @@ export class AgentRuntime implements IAgentRuntime {
 				// suppress a failure entry when the provider already logged this
 				// call before throwing (#17532).
 				recordingStateRef = recordingState;
+				this.validateEmbeddingModelOutput(
+					resolvedModelKey,
+					resolvedModel.provider ?? "unknown",
+					handlerResult,
+					modelParams,
+					internalCall === EMBEDDING_DIMENSION_PROBE_CALL,
+				);
 				const rawResponse = handlerResult;
 
 				let safeRawResponse: unknown =
@@ -7560,6 +7707,13 @@ export class AgentRuntime implements IAgentRuntime {
 				resultRef.current =
 					piiSwapSession?.substituteInValue(resultRef.current) ??
 					resultRef.current;
+				this.validateEmbeddingModelOutput(
+					resolvedModelKey,
+					resolvedModel.provider ?? "unknown",
+					resultRef.current,
+					modelParams,
+					internalCall === EMBEDDING_DIMENSION_PROBE_CALL,
+				);
 
 				// Record the provider that actually served this call so callers
 				// that can't see the internal resolution (message.ts stage
@@ -10614,7 +10768,22 @@ ${section_end}`;
 		);
 	}
 
-	async ensureEmbeddingDimension() {
+	async ensureEmbeddingDimension(): Promise<void> {
+		if (this.embeddingDimensionMigration) {
+			return this.embeddingDimensionMigration;
+		}
+		const migration = this.performEmbeddingDimensionMigration();
+		this.embeddingDimensionMigration = migration;
+		try {
+			await migration;
+		} finally {
+			if (this.embeddingDimensionMigration === migration) {
+				this.embeddingDimensionMigration = undefined;
+			}
+		}
+	}
+
+	private async performEmbeddingDimensionMigration(): Promise<void> {
 		if (!this.adapter) {
 			throw new Error(
 				"Database adapter not initialized before ensureEmbeddingDimension",
@@ -10703,6 +10872,7 @@ ${section_end}`;
 					ModelType.TEXT_EMBEDDING,
 					null,
 					registration.provider,
+					EMBEDDING_DIMENSION_PROBE_CALL,
 				);
 			} catch (error) {
 				// error-policy:J4 Probe each registered provider independently;
@@ -10750,6 +10920,7 @@ ${section_end}`;
 
 			await this.adapter.ensureEmbeddingDimension(embedding.length);
 			this.pinnedEmbeddingProvider = registration.provider;
+			this.pinnedEmbeddingDimension = embedding.length;
 			this.enableEmbeddingGeneration();
 			// Reclaim any vectors left in a different dimension column — e.g. cloud
 			// 1536-dim embeddings after this agent switched to on-device gte-small

@@ -273,7 +273,10 @@ describe("PostgreSQL E2E Tests", () => {
       };
 
       await adapter.createMemory(memory, "messages");
-      await adapter.ensureEmbeddingDimension(123 as number);
+      await expect(adapter.ensureEmbeddingDimension(123 as number)).rejects.toMatchObject({
+        code: "EMBEDDING_DIMENSION_UNSUPPORTED",
+        context: { requestedDimension: 123, activeDimension: 384 },
+      });
 
       const memories = await adapter.getMemories({
         roomId,

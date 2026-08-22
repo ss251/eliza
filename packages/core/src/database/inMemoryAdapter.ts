@@ -528,6 +528,48 @@ export class InMemoryDatabaseAdapter extends DatabaseAdapter<
 		this.embeddingDimension = dimension;
 	}
 
+	private validateMemoryEmbedding(
+		memory: Partial<Memory> & { id?: UUID },
+	): void {
+		if (memory.embedding === undefined) return;
+		const memoryId = memory.id;
+		if (!Array.isArray(memory.embedding)) {
+			throw new ElizaError("Memory embedding must be an array", {
+				code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+				context: { memoryId, outputKind: typeof memory.embedding },
+				severity: "fatal",
+			});
+		}
+		const expectedDimension = this.embeddingDimension;
+		if (
+			expectedDimension !== undefined &&
+			memory.embedding.length !== expectedDimension
+		) {
+			throw new ElizaError(
+				`Memory embedding dimension ${memory.embedding.length} does not match active dimension ${expectedDimension}`,
+				{
+					code: "EMBEDDING_DIMENSION_MISMATCH",
+					context: {
+						memoryId,
+						expectedDimension,
+						actualDimension: memory.embedding.length,
+					},
+					severity: "fatal",
+				},
+			);
+		}
+		const valueIndex = memory.embedding.findIndex(
+			(value) => typeof value !== "number" || !Number.isFinite(value),
+		);
+		if (valueIndex !== -1) {
+			throw new ElizaError("Memory embedding contains a non-finite value", {
+				code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+				context: { memoryId, valueIndex },
+				severity: "fatal",
+			});
+		}
+	}
+
 	async clearEmbeddingsOutsideActiveDimension(): Promise<UUID[]> {
 		if (
 			this.embeddingDimension === undefined ||
@@ -1481,6 +1523,9 @@ export class InMemoryDatabaseAdapter extends DatabaseAdapter<
 	async createMemories(
 		memories: Array<{ memory: Memory; tableName: string; unique?: boolean }>,
 	): Promise<UUID[]> {
+		for (const { memory } of memories) {
+			this.validateMemoryEmbedding(memory);
+		}
 		const ids: UUID[] = [];
 		for (const { memory, tableName, unique } of memories) {
 			const id = memory.id ? String(memory.id) : randomUuid();
@@ -1503,6 +1548,11 @@ export class InMemoryDatabaseAdapter extends DatabaseAdapter<
 	async updateMemories(
 		memories: Array<Partial<Memory> & { id: UUID; metadata?: MemoryMetadata }>,
 	): Promise<void> {
+		for (const memory of memories) {
+			if (this.memoriesById.has(String(memory.id))) {
+				this.validateMemoryEmbedding(memory);
+			}
+		}
 		for (const memory of memories) {
 			const existing = this.memoriesById.get(String(memory.id));
 			if (!existing) {

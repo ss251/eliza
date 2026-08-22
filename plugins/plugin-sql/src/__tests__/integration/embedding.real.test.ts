@@ -13,7 +13,7 @@ import {
   type UUID,
 } from "@elizaos/core";
 import { v4 as uuidv4 } from "uuid";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PgDatabaseAdapter } from "../../pg/adapter";
 import type { PgliteDatabaseAdapter } from "../../pglite/adapter";
 import { embeddingTable, memoryTable } from "../../schema";
@@ -94,6 +94,54 @@ describe("Embedding Integration Tests", () => {
       expect(retrieved?.embedding?.length).toBe(384);
     });
 
+    it("rejects a wrong-width embedding without persisting a vectorless memory", async () => {
+      await adapter.ensureEmbeddingDimension(384);
+      const memory: Memory = {
+        id: uuidv4() as UUID,
+        agentId: testAgentId,
+        entityId: testEntityId,
+        roomId: testRoomId,
+        content: { text: "must remain atomic" },
+        embedding: new Array(1536).fill(0),
+        createdAt: Date.now(),
+        unique: false,
+        metadata: { type: MemoryType.CUSTOM, source: "test" },
+      };
+
+      await expect(adapter.createMemory(memory, "embedding_test")).rejects.toMatchObject({
+        code: "EMBEDDING_DIMENSION_MISMATCH",
+        context: {
+          memoryId: memory.id,
+          expectedDimension: 384,
+          actualDimension: 1536,
+        },
+      });
+      await expect(adapter.getMemoryById(memory.id as UUID)).resolves.toBeNull();
+    });
+
+    it("rejects a non-finite embedding without rewriting it to zero", async () => {
+      await adapter.ensureEmbeddingDimension(384);
+      const embedding = new Array(384).fill(0);
+      embedding[11] = Number.NaN;
+      const memory: Memory = {
+        id: uuidv4() as UUID,
+        agentId: testAgentId,
+        entityId: testEntityId,
+        roomId: testRoomId,
+        content: { text: "invalid vector" },
+        embedding,
+        createdAt: Date.now(),
+        unique: false,
+        metadata: { type: MemoryType.CUSTOM, source: "test" },
+      };
+
+      await expect(adapter.createMemory(memory, "embedding_test")).rejects.toMatchObject({
+        code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+        context: { memoryId: memory.id, valueIndex: 11 },
+      });
+      await expect(adapter.getMemoryById(memory.id as UUID)).resolves.toBeNull();
+    });
+
     it("should handle different embedding dimensions", async () => {
       // Test with 768 dimensions
       await adapter.ensureEmbeddingDimension(768);
@@ -116,6 +164,59 @@ describe("Embedding Integration Tests", () => {
       const memoryId = await adapter.createMemory(memory768, "embedding_test_768");
       const retrieved = await adapter.getMemoryById(memoryId);
       expect(retrieved?.embedding?.length).toBe(768);
+    });
+
+    it("keeps the previous dimension active when index creation fails", async () => {
+      await adapter.ensureEmbeddingDimension(384);
+      const adapterInternals = adapter as unknown as {
+        ensureEmbeddingVectorIndex: (dimension: number) => Promise<void>;
+      };
+      const indexFailure = vi
+        .spyOn(adapterInternals, "ensureEmbeddingVectorIndex")
+        .mockRejectedValueOnce(new Error("index creation failed"));
+
+      await expect(adapter.ensureEmbeddingDimension(768)).rejects.toThrow("index creation failed");
+      indexFailure.mockRestore();
+
+      const oldWidth: Memory = {
+        id: uuidv4() as UUID,
+        agentId: testAgentId,
+        entityId: testEntityId,
+        roomId: testRoomId,
+        content: { text: "old dimension remains writable" },
+        embedding: new Array(384).fill(0),
+        createdAt: Date.now(),
+        unique: false,
+        metadata: { type: MemoryType.CUSTOM, source: "test" },
+      };
+      await expect(adapter.createMemory(oldWidth, "embedding_test")).resolves.toBe(oldWidth.id);
+
+      const newWidth = { ...oldWidth, id: uuidv4() as UUID, embedding: new Array(768).fill(0) };
+      await expect(adapter.createMemory(newWidth, "embedding_test")).rejects.toMatchObject({
+        code: "EMBEDDING_DIMENSION_MISMATCH",
+        context: { expectedDimension: 384, actualDimension: 768 },
+      });
+    });
+
+    it("typed-rejects an unsupported dimension without changing adapter state", async () => {
+      await adapter.ensureEmbeddingDimension(384);
+      await expect(adapter.ensureEmbeddingDimension(123)).rejects.toMatchObject({
+        code: "EMBEDDING_DIMENSION_UNSUPPORTED",
+        context: { requestedDimension: 123, activeDimension: 384 },
+      });
+
+      const memory: Memory = {
+        id: uuidv4() as UUID,
+        agentId: testAgentId,
+        entityId: testEntityId,
+        roomId: testRoomId,
+        content: { text: "unsupported migration changed nothing" },
+        embedding: new Array(384).fill(0),
+        createdAt: Date.now(),
+        unique: false,
+        metadata: { type: MemoryType.CUSTOM, source: "test" },
+      };
+      await expect(adapter.createMemory(memory, "embedding_test")).resolves.toBe(memory.id);
     });
 
     it("clearEmbeddingsOutsideActiveDimension reclaims stale-dimension vectors and keeps active-dimension ones", async () => {

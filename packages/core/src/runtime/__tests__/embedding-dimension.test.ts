@@ -435,6 +435,396 @@ describe("AgentRuntime.ensureEmbeddingDimension provider failover", () => {
 		expect(localBatch).toHaveBeenCalledTimes(1);
 		expect(vectors[0]).toHaveLength(384);
 	});
+
+	it("rejects a single embedding whose width changes after the dimension probe", async () => {
+		const runtime = makeRuntime();
+		let calls = 0;
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(calls++ === 0 ? 384 : 1536).fill(0),
+			"local",
+			100,
+		);
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING, "hello"),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_DIMENSION_MISMATCH",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING,
+				provider: "local",
+				expectedDimension: 384,
+				actualDimension: 1536,
+			},
+		});
+	});
+
+	it("rejects a pinned batch when any vector has the wrong width", async () => {
+		const runtime = makeRuntime();
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(384).fill(0),
+			"local",
+			100,
+		);
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING_BATCH,
+			async () => [new Array(384).fill(0), new Array(1536).fill(0)],
+			"local",
+			100,
+		);
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING_BATCH, {
+				texts: ["first", "second"],
+			}),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_DIMENSION_MISMATCH",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING_BATCH,
+				provider: "local",
+				expectedDimension: 384,
+				actualDimension: 1536,
+				vectorIndex: 1,
+			},
+		});
+	});
+
+	it("rejects a batch whose vector count does not match its input count", async () => {
+		const runtime = makeRuntime();
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(384).fill(0),
+			"local",
+			100,
+		);
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING_BATCH,
+			async () => [new Array(384).fill(0)],
+			"local",
+			100,
+		);
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING_BATCH, {
+				texts: ["first", "second"],
+			}),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING_BATCH,
+				provider: "local",
+				expectedCount: 2,
+				actualCount: 1,
+			},
+		});
+	});
+
+	it("rejects non-finite embedding elements before callers can persist them", async () => {
+		const runtime = makeRuntime();
+		let calls = 0;
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => {
+				const vector = new Array(384).fill(0);
+				if (calls++ > 0) vector[7] = Number.NaN;
+				return vector;
+			},
+			"local",
+			100,
+		);
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING, "hello"),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_MODEL_OUTPUT_INVALID",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING,
+				provider: "local",
+				valueIndex: 7,
+			},
+		});
+	});
+
+	it("rejects a wrong-width result even when the caller explicitly selects another provider", async () => {
+		const runtime = makeRuntime();
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(384).fill(0),
+			"local",
+			100,
+		);
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING_BATCH,
+			async () => [new Array(1536).fill(0)],
+			"cloud",
+			100,
+		);
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(
+				ModelType.TEXT_EMBEDDING_BATCH,
+				{ texts: ["hello"] },
+				"cloud",
+			),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_DIMENSION_MISMATCH",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING_BATCH,
+				provider: "cloud",
+				expectedDimension: 384,
+				actualDimension: 1536,
+				vectorIndex: 0,
+			},
+		});
+	});
+
+	it("keeps ordinary calls on the old width until a call-scoped re-probe commits the new dimension", async () => {
+		const runtime = makeRuntime();
+		let dimension = 384;
+		let holdProbe = false;
+		let releaseProbe: (() => void) | undefined;
+		let announceProbeStarted: (() => void) | undefined;
+		const probeGate = new Promise<void>((resolve) => {
+			releaseProbe = resolve;
+		});
+		const probeStarted = new Promise<void>((resolve) => {
+			announceProbeStarted = resolve;
+		});
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async (_modelRuntime, input) => {
+				if (input === null && holdProbe) {
+					announceProbeStarted?.();
+					await probeGate;
+				}
+				return new Array(dimension).fill(0);
+			},
+			"local",
+			100,
+		);
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING_BATCH,
+			async (_modelRuntime, params: { texts: string[] }) =>
+				params.texts.map(() => new Array(dimension).fill(0)),
+			"local",
+			100,
+		);
+		const ensureDim = vi.spyOn(runtime.adapter, "ensureEmbeddingDimension");
+
+		await runtime.ensureEmbeddingDimension();
+		expect(ensureDim).toHaveBeenLastCalledWith(384);
+
+		dimension = 1536;
+		holdProbe = true;
+		const migration = runtime.ensureEmbeddingDimension();
+		await probeStarted;
+
+		let ordinarySettled = false;
+		const ordinary = runtime
+			.useModel(ModelType.TEXT_EMBEDDING, "during migration")
+			.then(
+				(value) => ({ status: "fulfilled" as const, value }),
+				(error: unknown) => ({ status: "rejected" as const, error }),
+			)
+			.finally(() => {
+				ordinarySettled = true;
+			});
+		await Promise.resolve();
+		await Promise.resolve();
+		const settledBeforeMigrationCommitted = ordinarySettled;
+		expect(ensureDim).toHaveBeenCalledTimes(1);
+
+		releaseProbe?.();
+		await expect(migration).resolves.toBeUndefined();
+		expect(ensureDim).toHaveBeenLastCalledWith(1536);
+		const ordinaryOutcome = await ordinary;
+		expect(settledBeforeMigrationCommitted).toBe(false);
+		expect(ordinaryOutcome.status).toBe("fulfilled");
+		if (ordinaryOutcome.status === "fulfilled") {
+			expect(ordinaryOutcome.value).toHaveLength(1536);
+		}
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING, "after migration"),
+		).resolves.toHaveLength(1536);
+		const batch = await runtime.useModel(ModelType.TEXT_EMBEDDING_BATCH, {
+			texts: ["after", "migration"],
+		});
+		expect(batch).toHaveLength(2);
+		expect(batch[0]).toHaveLength(1536);
+		expect(batch[1]).toHaveLength(1536);
+	});
+
+	it("rejects an old-width memory atomically if persistence races a dimension migration", async () => {
+		const adapter = new InMemoryDatabaseAdapter();
+		const runtime = new AgentRuntime({
+			character: {
+				name: "EmbeddingMigrationAgent",
+				bio: "test",
+			} as Character,
+			adapter,
+			logLevel: "fatal",
+		});
+		let dimension = 384;
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(dimension).fill(0),
+			"local",
+			100,
+		);
+		await runtime.ensureEmbeddingDimension();
+
+		const oldWidthMemory = {
+			...makeMemory("generated before migration"),
+			id: "00000000-0000-0000-0000-000000000004" as UUID,
+		};
+		await runtime.addEmbeddingToMemory(oldWidthMemory);
+		expect(oldWidthMemory.embedding).toHaveLength(384);
+
+		let announceAdapterSwitched: (() => void) | undefined;
+		let releaseAdapter: (() => void) | undefined;
+		const adapterSwitched = new Promise<void>((resolve) => {
+			announceAdapterSwitched = resolve;
+		});
+		const adapterGate = new Promise<void>((resolve) => {
+			releaseAdapter = resolve;
+		});
+		const originalEnsure = adapter.ensureEmbeddingDimension.bind(adapter);
+		vi.spyOn(adapter, "ensureEmbeddingDimension").mockImplementation(
+			async (nextDimension) => {
+				await originalEnsure(nextDimension);
+				if (nextDimension === 1536) {
+					announceAdapterSwitched?.();
+					await adapterGate;
+				}
+			},
+		);
+
+		dimension = 1536;
+		const migration = runtime.ensureEmbeddingDimension();
+		await adapterSwitched;
+
+		const persistenceOutcome = await runtime
+			.createMemory(oldWidthMemory, "documents")
+			.then(
+				() => ({ status: "fulfilled" as const }),
+				(error: unknown) => ({ status: "rejected" as const, error }),
+			);
+		releaseAdapter?.();
+		await expect(migration).resolves.toBeUndefined();
+
+		expect(persistenceOutcome.status).toBe("rejected");
+		if (persistenceOutcome.status === "rejected") {
+			expect(persistenceOutcome.error).toMatchObject<Partial<ElizaError>>({
+				code: "EMBEDDING_DIMENSION_MISMATCH",
+				severity: "fatal",
+				context: {
+					expectedDimension: 1536,
+					actualDimension: 384,
+					memoryId: oldWidthMemory.id,
+				},
+			});
+		}
+		await expect(runtime.getMemoryById(oldWidthMemory.id)).resolves.toBeNull();
+	});
+
+	it("does not commit a new runtime pin when the adapter rejects the probed dimension", async () => {
+		const adapter = new InMemoryDatabaseAdapter();
+		const runtime = new AgentRuntime({
+			character: {
+				name: "EmbeddingUnsupportedAgent",
+				bio: "test",
+			} as Character,
+			adapter,
+			logLevel: "fatal",
+		});
+		let dimension = 384;
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(dimension).fill(0),
+			"local",
+			100,
+		);
+		await runtime.ensureEmbeddingDimension();
+
+		const originalEnsure = adapter.ensureEmbeddingDimension.bind(adapter);
+		vi.spyOn(adapter, "ensureEmbeddingDimension").mockImplementation(
+			async (nextDimension) => {
+				if (nextDimension === 123) {
+					throw Object.assign(new Error("unsupported embedding dimension"), {
+						code: "EMBEDDING_DIMENSION_UNSUPPORTED",
+					});
+				}
+				return originalEnsure(nextDimension);
+			},
+		);
+
+		dimension = 123;
+		await expect(runtime.ensureEmbeddingDimension()).rejects.toMatchObject({
+			code: "EMBEDDING_DIMENSION_UNSUPPORTED",
+		});
+		expect(runtime.isEmbeddingGenerationDisabled()).toBe(false);
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING, "after rejected migration"),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_DIMENSION_MISMATCH",
+			context: { expectedDimension: 384, actualDimension: 123 },
+		});
+	});
+
+	it("revalidates embedding width after post-model hooks", async () => {
+		const runtime = makeRuntime();
+		runtime.registerModel(
+			ModelType.TEXT_EMBEDDING,
+			async () => new Array(384).fill(0),
+			"local",
+			100,
+		);
+		runtime.registerPipelineHook({
+			id: "wrong-width-embedding-output",
+			phase: "post_model",
+			handler: (_hookRuntime, context) => {
+				if (
+					context.phase === "post_model" &&
+					context.requestedModelType === ModelType.TEXT_EMBEDDING &&
+					context.params !== null
+				) {
+					context.result.current = new Array(1536).fill(0);
+				}
+			},
+		});
+
+		await runtime.ensureEmbeddingDimension();
+
+		await expect(
+			runtime.useModel(ModelType.TEXT_EMBEDDING, "hello"),
+		).rejects.toMatchObject<Partial<ElizaError>>({
+			code: "EMBEDDING_DIMENSION_MISMATCH",
+			severity: "fatal",
+			context: {
+				modelType: ModelType.TEXT_EMBEDDING,
+				provider: "local",
+				expectedDimension: 384,
+				actualDimension: 1536,
+			},
+		});
+	});
 });
 
 describe("AgentRuntime.initialize with a broken TEXT_EMBEDDING provider (#10702)", () => {
