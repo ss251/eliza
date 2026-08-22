@@ -27,10 +27,12 @@
  *
  * Auth gating: `requiresAuth` / `requiresElevated` commands are gated at the
  * connector boundary using the agent's role model (`hasRoleAccess`) — the same
- * mechanism every surface uses. The Telegram sender is mapped to a runtime
- * entity (matching `MessageManager`'s account-scoped id), and a command is
- * refused with a clear reply when the sender is not an owner (for
- * `requiresAuth`) or admin (for `requiresElevated`).
+ * mechanism every surface uses. The Telegram sender is mapped through
+ * `resolveTelegramRuntimeEntityId` (the same function `MessageManager.handleMessage`
+ * uses), so a paired owner is the canonical owner entity rather than a fresh
+ * hash of their numeric Telegram id. A command is refused with a clear reply
+ * when the sender is not an owner (for `requiresAuth`) or admin (for
+ * `requiresElevated`).
  *
  * A matched `bot.command` handler never calls `next()`, so the catch-all
  * message handler registered in `service.ts` does not also process command
@@ -56,6 +58,7 @@ import {
   resolveSettingsSection,
 } from "@elizaos/plugin-commands";
 import type { Context, Telegraf } from "telegraf";
+import { resolveTelegramRuntimeEntityId } from "./identity";
 import type { MessageManager } from "./messageManager";
 
 /**
@@ -206,9 +209,8 @@ export function resolveTelegramEmbedUrl(runtime: IAgentRuntime): string | null {
  * Resolve the Telegram sender's trust level using the agent's role model — the
  * same `hasRoleAccess` check every surface runs. OWNER access satisfies
  * `requiresAuth`; ADMIN access satisfies `requiresElevated`. The sender's
- * Telegram user id is mapped through the account-scoped `createUniqueUuid`
- * (matching `MessageManager`), so role resolution reads the canonical-owner /
- * world-role state the inbound pipeline established.
+ * Telegram user id is mapped through `resolveTelegramRuntimeEntityId`, matching
+ * `MessageManager.handleMessage`, so a paired owner is recognized as OWNER.
  */
 export async function resolveTelegramSenderAuth(
   ctx: Context,
@@ -222,10 +224,11 @@ export async function resolveTelegramSenderAuth(
     return { isAuthorized: false, isElevated: false };
   }
 
-  const entityId = createUniqueUuid(
+  const entityId = await resolveTelegramRuntimeEntityId(
     runtime,
-    scopedTelegramKey(String(fromId), accountId),
-  ) as UUID;
+    accountId,
+    String(fromId),
+  );
   const roomId = createUniqueUuid(
     runtime,
     scopedTelegramKey(String(chatId), accountId),
@@ -267,10 +270,11 @@ async function dispatchAgentCommand(
   const fromId = ctx.from?.id;
   const chatId = ctx.chat?.id;
   if (fromId !== undefined && chatId !== undefined) {
-    const entityId = createUniqueUuid(
+    const entityId = await resolveTelegramRuntimeEntityId(
       runtime,
-      scopedTelegramKey(String(fromId), accountId),
-    ) as UUID;
+      accountId,
+      String(fromId),
+    );
     const roomId = createUniqueUuid(
       runtime,
       scopedTelegramKey(String(chatId), accountId),

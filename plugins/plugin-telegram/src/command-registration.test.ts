@@ -4,7 +4,7 @@
  * per command (never clobbering `eliza_pair`), and role-gated dispatch. Runtime
  * and `hasRoleAccess` are mocked.
  */
-import type { IAgentRuntime } from "@elizaos/core";
+import { createUniqueUuid, type IAgentRuntime } from "@elizaos/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // The connector bridge gates auth via the agent role model (`hasRoleAccess`).
@@ -73,7 +73,9 @@ import {
   buildTelegramCommandDescriptors,
   registerTelegramCommandHandlers,
   resolveTelegramEmbedUrl,
+  resolveTelegramSenderAuth,
 } from "./command-registration";
+import { resolveTelegramRuntimeEntityId } from "./identity";
 import type { MessageManager } from "./messageManager";
 
 const { getConnectorCommands } = pluginCommandsMock;
@@ -272,6 +274,60 @@ describe("registerTelegramCommandHandlers", () => {
     expect(reply).toHaveBeenCalledTimes(1);
     expect(reply.mock.calls[0]?.[0]).toContain("settings");
     expect(reply.mock.calls[0]?.[0]).toContain("Eliza app");
+  });
+
+  it("maps a paired owner onto the canonical owner entity for requiresAuth commands", async () => {
+    const ownerId = "11111111-1111-4111-8111-111111111111";
+    const seenEntityIds: string[] = [];
+    hasRoleAccess.mockImplementation(
+      async (_runtime, memory: { entityId: string }) => {
+        seenEntityIds.push(memory.entityId);
+        return memory.entityId === ownerId;
+      },
+    );
+    const runtime = makeRuntime({ ELIZA_ADMIN_ENTITY_ID: ownerId });
+    (
+      runtime as IAgentRuntime & {
+        getEntityById: ReturnType<typeof vi.fn>;
+      }
+    ).getEntityById = vi.fn(async () => ({
+      id: ownerId,
+      metadata: { telegram: { id: "4242", userId: "4242" } },
+    }));
+
+    const { handlers } = registerHandlers(runtime);
+    const restartHandler = handlers.get("restart");
+    expect(restartHandler).toBeDefined();
+    const { ctx, reply } = makeCtx("/restart");
+    await restartHandler?.(ctx);
+
+    expect(seenEntityIds[0]).toBe(ownerId);
+    expect(reply.mock.calls.map((call) => call[0])).not.toContain(
+      "This command requires authorization.",
+    );
+  });
+
+  it("keeps an unpaired sender on the same entity id handleMessage uses", async () => {
+    const seenEntityIds: string[] = [];
+    hasRoleAccess.mockImplementation(
+      async (_runtime, memory: { entityId: string }) => {
+        seenEntityIds.push(memory.entityId);
+        return false;
+      },
+    );
+    const runtime = makeRuntime();
+    const expected = await resolveTelegramRuntimeEntityId(
+      runtime,
+      "default",
+      "4242",
+    );
+    const hashedTelegramId = createUniqueUuid(runtime, "4242");
+
+    const { ctx } = makeCtx("/restart");
+    await resolveTelegramSenderAuth(ctx, runtime, "default");
+
+    expect(seenEntityIds[0]).toBe(expected);
+    expect(seenEntityIds[0]).not.toBe(hashedTelegramId);
   });
 
   it.each([
