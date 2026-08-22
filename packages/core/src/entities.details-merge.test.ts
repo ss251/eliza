@@ -2,10 +2,16 @@
  * Deterministic tests for `getEntityDetails` component-data merge on the real
  * module. Origin Object.assign last-wins dropped earlier array values; the
  * intended per-key union must keep every scalar, array member, and nested
- * object field. Adapter seams are stubbed; getEntityDetails is not replaced.
+ * object field. An id-less persisted entity must fail with a typed integrity
+ * error instead of disappearing from model context. Adapter seams are stubbed;
+ * getEntityDetails is not replaced.
  */
 import { describe, expect, it } from "vitest";
-import { getEntityDetails } from "./entities";
+import {
+	ENTITY_DETAILS_MISSING_ID,
+	EntityDetailsIntegrityError,
+	getEntityDetails,
+} from "./entities";
 import type { Entity, IAgentRuntime, UUID } from "./types";
 
 const AGENT = "00000000-0000-0000-0000-0000000000aa" as UUID;
@@ -124,5 +130,32 @@ describe("getEntityDetails component merge", () => {
 
 		const details = await getEntityDetails({ runtime, roomId: ROOM });
 		expect(details.map((row) => row.names[0])).toEqual(["Alice", "Bob"]);
+	});
+
+	it("rejects an id-less room entity instead of silently dropping it", async () => {
+		const runtime = {
+			agentId: AGENT,
+			getRoom: async () => ({ id: ROOM }),
+			getEntitiesForRoom: async () => [
+				{
+					id: ALICE,
+					agentId: AGENT,
+					names: ["Alice"],
+					components: [],
+				} as Entity,
+				{
+					agentId: AGENT,
+					names: ["Unsaved Bob"],
+					components: [],
+				} as Entity,
+			],
+		} as unknown as IAgentRuntime;
+
+		const pending = getEntityDetails({ runtime, roomId: ROOM });
+		await expect(pending).rejects.toBeInstanceOf(EntityDetailsIntegrityError);
+		await expect(pending).rejects.toMatchObject({
+			code: ENTITY_DETAILS_MISSING_ID,
+			context: { roomId: ROOM, entityIndex: 1 },
+		});
 	});
 });

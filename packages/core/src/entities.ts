@@ -7,8 +7,14 @@
  * Room messages are read without a limit, the same unbounded contract the
  * recent-messages provider uses — never a most-recent or item-count window
  * (`AGENTS.md` prompt integrity, the "never discard model context" section).
- * A unique exact name/handle hit returns without a model call. Component
- * filtering copies the entity and keeps the target's own identity components.
+ * Contextual `me` / `you` referents bind to the sender / agent before
+ * ordinary name lookup. A unique exact name/handle hit returns without a model
+ * call. Model results return an entity only when their decisive type,
+ * entityId, and match labels identify one consistent candidate; AMBIGUOUS and
+ * UNKNOWN are terminal. Component filtering copies the entity and keeps the
+ * target's own identity components. `getEntityDetails` rejects an id-less room
+ * entity with a typed integrity error instead of silently dropping it from
+ * model context.
  * `getEntityDetails` and `formatEntities` merge and render a room's entities for
  * prompt context. Component data is merged per key: arrays are unioned, nested
  * objects are shallow-merged, and scalars keep last-write. `createUniqueUuid`
@@ -28,6 +34,7 @@ import {
 	normalizeEntityMatches,
 	readEntityResolutionField,
 } from "./entity-matches";
+import { ElizaError } from "./errors";
 import { logger } from "./logger";
 // Type-only (erased at runtime, so no cycle with roles.ts, which imports
 // createUniqueUuid from this module). The role-resolution values are pulled via a
@@ -54,6 +61,25 @@ type EntityDetailsRecord = Pick<
 	name?: string;
 	data: string;
 };
+
+export const ENTITY_DETAILS_MISSING_ID = "ENTITY_DETAILS_MISSING_ID";
+
+/**
+ * `getEntityDetails` cannot safely deduplicate or identify a room entity whose
+ * persistence adapter omitted its id. Reject the whole projection explicitly:
+ * returning the remaining rows would silently remove model-facing context.
+ */
+export class EntityDetailsIntegrityError extends ElizaError {
+	override readonly name = "EntityDetailsIntegrityError";
+
+	constructor(roomId: UUID, entityIndex: number) {
+		super("Room entity is missing its required persisted id", {
+			code: ENTITY_DETAILS_MISSING_ID,
+			context: { roomId, entityIndex },
+			severity: "fatal",
+		});
+	}
+}
 
 /**
  * Component-visibility filtering decides trust from each source entity's
@@ -382,6 +408,23 @@ function entitiesMatchingReferent(
 		.map((entry) => entry.entity);
 }
 
+function contextualReferentId(
+	referent: string,
+	messageEntityId: UUID,
+	agentId: UUID,
+): UUID | null {
+	switch (normalizeEntityName(referent)) {
+		case "me":
+		case "myself":
+			return messageEntityId;
+		case "you":
+		case "yourself":
+			return agentId;
+		default:
+			return null;
+	}
+}
+
 async function getRecentInteractions(
 	sourceEntityId: UUID,
 	candidateEntities: Entity[],
@@ -495,6 +538,16 @@ export async function findEntityByName(
 	]);
 	const indexedEntities = indexEntities(allEntities);
 	const referent = referentTextOf(message);
+	const contextualEntityId = contextualReferentId(
+		referent,
+		message.entityId,
+		runtime.agentId,
+	);
+	if (contextualEntityId) {
+		return (
+			allEntities.find((entity) => entity.id === contextualEntityId) ?? null
+		);
+	}
 	const uniqueReferentHits = entitiesMatchingReferent(
 		indexedEntities,
 		referent,
@@ -561,11 +614,14 @@ export async function findEntityByName(
 		return null;
 	}
 
-	if (resolution.type === "EXACT_MATCH" && resolution.entityId) {
-		const matched = candidateById.get(resolution.entityId as UUID);
-		if (matched) {
-			return matched;
-		}
+	const decisiveTypes = new Set([
+		"EXACT_MATCH",
+		"USERNAME_MATCH",
+		"NAME_MATCH",
+		"RELATIONSHIP_MATCH",
+	]);
+	if (!resolution.type || !decisiveTypes.has(resolution.type)) {
+		return null;
 	}
 
 	let matchesArray: EntityMatch[] = [];
@@ -576,27 +632,47 @@ export async function findEntityByName(
 		matchesArray = Array.isArray(matchValue) ? matchValue : [matchValue];
 	}
 
-	for (const match of matchesArray) {
-		if (!match?.name) continue;
-		const matchName = normalizeEntityName(match.name);
-		const matchKey = stripAtPrefix(match.name);
-		const matchingEntity = indexedEntities.find((entry) =>
-			indexedEntityMatches(entry, matchName, matchKey),
-		)?.entity;
-		if (!matchingEntity) continue;
-		if (resolution.type === "RELATIONSHIP_MATCH") {
-			const interactionInfo = interactionData.find(
-				(data) => data.entity.id === matchingEntity.id,
-			);
-			if (interactionInfo && interactionInfo.count > 0) {
-				return matchingEntity;
-			}
-			continue;
+	const resolvedCandidates = new Map<UUID, Entity>();
+	if (resolution.entityId) {
+		const matched = candidateById.get(resolution.entityId as UUID);
+		if (!matched?.id) {
+			return null;
 		}
-		return matchingEntity;
+		resolvedCandidates.set(matched.id, matched);
 	}
 
-	return null;
+	for (const match of matchesArray) {
+		if (!match?.name) {
+			return null;
+		}
+		const matchingEntities = entitiesMatchingReferent(
+			indexedEntities,
+			match.name,
+		);
+		const matchingEntity = matchingEntities[0];
+		if (matchingEntities.length !== 1 || !matchingEntity?.id) {
+			return null;
+		}
+		resolvedCandidates.set(matchingEntity.id, matchingEntity);
+	}
+
+	if (resolvedCandidates.size !== 1) {
+		return null;
+	}
+	const matchingEntity = resolvedCandidates.values().next().value as
+		| Entity
+		| undefined;
+	if (!matchingEntity) {
+		return null;
+	}
+	if (resolution.type === "RELATIONSHIP_MATCH") {
+		const interactionInfo = interactionData.find(
+			(data) => data.entity.id === matchingEntity.id,
+		);
+		return interactionInfo && interactionInfo.count > 0 ? matchingEntity : null;
+	}
+
+	return matchingEntity;
 }
 
 export const createUniqueUuid = (
@@ -628,9 +704,12 @@ export async function getEntityDetails({
 
 			const uniqueEntities = new Map<string, EntityDetailsRecord>();
 
-			for (const entity of roomEntities) {
+			for (const [entityIndex, entity] of roomEntities.entries()) {
 				const entityId = entity.id;
-				if (!entityId || uniqueEntities.has(entityId)) continue;
+				if (!entityId) {
+					throw new EntityDetailsIntegrityError(roomId, entityIndex);
+				}
+				if (uniqueEntities.has(entityId)) continue;
 
 				const mergedData: Record<string, unknown> = {};
 				for (const component of entity.components || []) {

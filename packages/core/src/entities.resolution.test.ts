@@ -1,7 +1,8 @@
 /**
  * Deterministic tests for `findEntityByName` on the real module: the resolution
- * prompt must carry the referent, EXACT_MATCH must stay inside the candidate
- * set, substring fallback must not bind a shorter handle, a target's own
+ * prompt must carry the referent, decisive results must identify one consistent
+ * candidate, terminal ambiguity must not become a target, contextual pronouns
+ * must resolve to the sender/agent before ordinary names, a target's own
  * identity components must remain visible, and a >20-message room transcript
  * must reach the TEXT_SMALL prompt in full (no most-recent window). Runtime
  * collaborators are stubbed at documented seams; findEntityByName is not
@@ -243,6 +244,312 @@ describe("findEntityByName referent and candidate containment", () => {
 			state,
 		);
 		expect(found?.id).toBe(ALICE);
+	});
+
+	it.each(["AMBIGUOUS", "UNKNOWN"])(
+		"does not turn a %s result's diagnostic id and match into a valid target",
+		async (type) => {
+			const found = await findEntityByName(
+				runtime({
+					getEntitiesForRoom: async () => [
+						structuredClone(bob),
+						structuredClone(alice),
+					],
+					getRelationships: async () => [],
+					useModel: async () => ({
+						type,
+						entityId: ALICE,
+						matches: [{ name: "Alice Smith", reason: "possible candidate" }],
+					}),
+				}),
+				message("who did they mean"),
+				state,
+			);
+			expect(found).toBeNull();
+		},
+	);
+
+	it("honors a RELATIONSHIP_MATCH entityId only when interaction evidence exists", async () => {
+		const modelResult = {
+			type: "RELATIONSHIP_MATCH",
+			entityId: ALICE,
+			matches: [],
+		};
+		const withInteraction = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () =>
+					[
+						{
+							id: "00000000-0000-0000-0000-0000000000r1",
+							sourceEntityId: BOB,
+							targetEntityId: ALICE,
+							agentId: AGENT,
+							tags: ["knows"],
+							metadata: { interactions: 1 },
+						},
+					] as Relationship[],
+				useModel: async () => modelResult,
+			}),
+			message("who did I talk to"),
+			state,
+		);
+		const withoutInteraction = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () => [],
+				useModel: async () => modelResult,
+			}),
+			message("who did I talk to"),
+			state,
+		);
+
+		expect(withInteraction?.id).toBe(ALICE);
+		expect(withoutInteraction).toBeNull();
+	});
+
+	it("honors a decisive USERNAME_MATCH entityId without requiring a duplicate match label", async () => {
+		const found = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () => [],
+				useModel: async () => ({
+					type: "USERNAME_MATCH",
+					entityId: ALICE,
+					matches: [],
+				}),
+			}),
+			message("who owns that username"),
+			state,
+		);
+		expect(found?.id).toBe(ALICE);
+	});
+
+	it("rejects contradictory entityId and match-name candidates", async () => {
+		const found = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () => [],
+				useModel: async () => ({
+					type: "NAME_MATCH",
+					entityId: ALICE,
+					matches: [{ name: "Bob", reason: "conflicts with entityId" }],
+				}),
+			}),
+			message("who did they mean"),
+			state,
+		);
+		expect(found).toBeNull();
+	});
+
+	it("rejects an out-of-set entityId even when a match label names a valid candidate", async () => {
+		const found = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () => [],
+				useModel: async () => ({
+					type: "NAME_MATCH",
+					entityId: STRANGER,
+					matches: [{ name: "Alice Smith", reason: "valid label" }],
+				}),
+			}),
+			message("who did they mean"),
+			state,
+		);
+		expect(found).toBeNull();
+	});
+
+	it("rejects one match label shared by multiple candidate entities", async () => {
+		const firstAlex = entity(ALICE, ["Alex"]);
+		const secondAlex = entity(STRANGER, ["Alex"]);
+		const found = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [firstAlex, secondAlex],
+				getRelationships: async () => [],
+				useModel: async () => ({
+					type: "NAME_MATCH",
+					entityId: null,
+					matches: [{ name: "Alex", reason: "name match" }],
+				}),
+			}),
+			message("which Alex replied"),
+			state,
+		);
+		expect(found).toBeNull();
+	});
+
+	it.each(["me", "myself"])(
+		"resolves %s to the sender before considering an entity literally named Me",
+		async (referent) => {
+			const personNamedMe = entity(STRANGER, ["Me"]);
+			const found = await findEntityByName(
+				runtime({
+					getEntitiesForRoom: async () => [structuredClone(bob), personNamedMe],
+					getRelationships: async () => [],
+					useModel: async () => {
+						throw new Error("contextual referent should not call the model");
+					},
+				}),
+				message(referent),
+				state,
+			);
+			expect(found?.id).toBe(BOB);
+		},
+	);
+
+	it.each(["you", "yourself"])(
+		"resolves %s to the agent before considering an entity literally named You",
+		async (referent) => {
+			const agent = entity(AGENT, ["Eliza"]);
+			const personNamedYou = entity(STRANGER, ["You"]);
+			const found = await findEntityByName(
+				runtime({
+					getEntitiesForRoom: async () => [
+						structuredClone(bob),
+						agent,
+						personNamedYou,
+					],
+					getRelationships: async () => [],
+					useModel: async () => {
+						throw new Error("contextual referent should not call the model");
+					},
+				}),
+				message(referent),
+				state,
+			);
+			expect(found?.id).toBe(AGENT);
+		},
+	);
+
+	it("preserves a consistent NAME_MATCH entityId and match label", async () => {
+		const found = await findEntityByName(
+			runtime({
+				getEntitiesForRoom: async () => [
+					structuredClone(bob),
+					structuredClone(alice),
+				],
+				getRelationships: async () => [],
+				useModel: async () => ({
+					type: "NAME_MATCH",
+					entityId: ALICE,
+					matches: [{ name: "Alice Smith", reason: "consistent" }],
+				}),
+			}),
+			message("who did they mean"),
+			state,
+		);
+		expect(found?.id).toBe(ALICE);
+	});
+
+	it("preserves the byte-identical previously valid resolution corpus", async () => {
+		const resolveId = async (
+			text: string,
+			modelResult: unknown,
+			overrides: Partial<IAgentRuntime> = {},
+		): Promise<UUID | null> => {
+			const found = await findEntityByName(
+				runtime({
+					getEntitiesForRoom: async () => [
+						structuredClone(bob),
+						structuredClone(alice),
+					],
+					getRelationships: async () => [],
+					useModel: async () => modelResult,
+					...overrides,
+				}),
+				message(text),
+				state,
+			);
+			return found?.id ?? null;
+		};
+
+		const outputs = [
+			await resolveId("Bob", "not-used"),
+			await resolveId("who is that", {
+				type: "EXACT_MATCH",
+				entityId: ALICE,
+				matches: [],
+			}),
+			await resolveId("who is that", {
+				type: "NAME_MATCH",
+				entityId: null,
+				matches: [{ name: "Alice Smith", reason: "name" }],
+			}),
+			await resolveId("who is that", {
+				type: "USERNAME_MATCH",
+				entityId: null,
+				matches: [{ name: "alice", reason: "username" }],
+			}),
+			await resolveId(
+				"who is that",
+				{
+					type: "RELATIONSHIP_MATCH",
+					entityId: null,
+					matches: [{ name: "Alice Smith", reason: "recent contact" }],
+				},
+				{
+					getRelationships: async () =>
+						[
+							{
+								id: "00000000-0000-0000-0000-0000000000r1",
+								sourceEntityId: BOB,
+								targetEntityId: ALICE,
+								agentId: AGENT,
+								tags: ["knows"],
+								metadata: { interactions: 1 },
+							},
+						] as Relationship[],
+				},
+			),
+			await resolveId("who is that", {
+				type: "AMBIGUOUS",
+				entityId: null,
+				matches: [],
+			}),
+			await resolveId("who is that", {
+				type: "UNKNOWN",
+				entityId: null,
+				matches: [],
+			}),
+			await resolveId("who is that", "not-json"),
+			await resolveId("who is that", {
+				type: "NAME_MATCH",
+				entityId: ALICE,
+				matches: [{ name: "Alice Smith", reason: "consistent" }],
+			}),
+			await resolveId("@alice", "not-used"),
+		];
+		const serialized = JSON.stringify(outputs);
+		expect(serialized).toBe(
+			JSON.stringify([
+				BOB,
+				ALICE,
+				ALICE,
+				ALICE,
+				ALICE,
+				null,
+				null,
+				null,
+				ALICE,
+				ALICE,
+			]),
+		);
+		console.info(`VALID_ENTITY_RESOLUTION_CORPUS=${serialized}`);
 	});
 
 	it("puts every room message in the resolution prompt when more than 20 exist", async () => {
