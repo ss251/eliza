@@ -89,7 +89,11 @@ export async function repairRuntimeAfterBoot(
       createPostReadyBootSteps(resources),
       resources,
     ).then(
-      () => onPostReadyPhase?.("complete"),
+      () => {
+        if (resources.tailRuntime === runtime) {
+          onPostReadyPhase?.("complete");
+        }
+      },
       (err: unknown) => {
         // error-policy:J1 boundary translation — the deferred tail has no caller
         // left to throw to; a contributor or runtime-hook failure here would
@@ -113,7 +117,9 @@ export async function repairRuntimeAfterBoot(
       createPostReadyBootSteps(resources),
       resources,
     );
-    onPostReadyPhase?.("complete");
+    if (resources.tailRuntime === runtime) {
+      onPostReadyPhase?.("complete");
+    }
   } catch (err) {
     // error-policy:J2 context-preserving rethrow — inline mode makes a tail
     // failure fail boot; the phase marker prevents health from staying pending.
@@ -166,6 +172,9 @@ async function ensureTriggerEventBridge(
   const { startTriggerEventBridge } = await import(
     "../../services/trigger-event-bridge.js"
   );
+  // Shutdown may clear ownership while the optional module is loading. Do not
+  // publish a bridge after teardown has already inspected this resource slot.
+  if (resources.tailRuntime !== runtime) return;
   resources.triggerEventBridge = startTriggerEventBridge(runtime);
   logger.debug("[eliza] trigger event bridge armed");
 }
@@ -181,6 +190,8 @@ async function ensureConnectorTargetCatalog(
   const { createElizaConnectorTargetCatalog } = await import(
     "../../services/connector-target-catalog.js"
   );
+  // Like the trigger bridge, the catalog must not appear after teardown.
+  if (resources.tailRuntime !== runtime) return;
   const catalog = createElizaConnectorTargetCatalog({
     getConfig: () => loadElizaConfig(),
     listSources: () => {

@@ -37,6 +37,31 @@ export function createRuntimeBootResources(): RuntimeBootResources {
   };
 }
 
+function ownsPostReadyTail(
+  runtime: AgentRuntime,
+  resources: RuntimeBootResources,
+): boolean {
+  if (resources.tailRuntime === runtime) return true;
+  logger.info("[eliza] post-ready boot tail skipped — runtime superseded");
+  return false;
+}
+
+async function runOwnedPostReadyStep(
+  runtime: AgentRuntime,
+  resources: RuntimeBootResources,
+  step: Promise<void>,
+): Promise<boolean> {
+  try {
+    await step;
+  } catch (error) {
+    // A contributor that rejects after teardown belongs to the stopped boot
+    // attempt. Do not let its late failure overwrite the next attempt's phase.
+    if (!ownsPostReadyTail(runtime, resources)) return false;
+    throw error;
+  }
+  return ownsPostReadyTail(runtime, resources);
+}
+
 /** Runs contributors in the dependency order required by feature startup. */
 export async function runPostReadyBootTail(
   runtime: AgentRuntime,
@@ -45,18 +70,50 @@ export async function runPostReadyBootTail(
 ): Promise<void> {
   // Hot restart may publish another runtime before this deferred promise runs.
   // Only the boot attempt that owns this resource slot may mutate its runtime.
-  if (resources.tailRuntime !== runtime) {
-    logger.info("[eliza] post-ready boot tail skipped — runtime superseded");
-    return;
-  }
+  if (!ownsPostReadyTail(runtime, resources)) return;
 
-  await steps.registerAppRoutePlugins(runtime);
-  await steps.registerRuntimeHooks(runtime);
+  if (
+    !(await runOwnedPostReadyStep(
+      runtime,
+      resources,
+      steps.registerAppRoutePlugins(runtime),
+    ))
+  )
+    return;
+  if (
+    !(await runOwnedPostReadyStep(
+      runtime,
+      resources,
+      steps.registerRuntimeHooks(runtime),
+    ))
+  )
+    return;
   steps.registerCoreSensitiveRequestAdapters(runtime);
   steps.registerSubAgentCredentialBridgeAdapter(runtime);
-  await steps.registerSubAgentCredentialBridge(runtime);
-  await steps.ensureTriggerEventBridge(runtime);
-  await steps.ensureConnectorTargetCatalog(runtime);
+  if (
+    !(await runOwnedPostReadyStep(
+      runtime,
+      resources,
+      steps.registerSubAgentCredentialBridge(runtime),
+    ))
+  )
+    return;
+  if (
+    !(await runOwnedPostReadyStep(
+      runtime,
+      resources,
+      steps.ensureTriggerEventBridge(runtime),
+    ))
+  )
+    return;
+  if (
+    !(await runOwnedPostReadyStep(
+      runtime,
+      resources,
+      steps.ensureConnectorTargetCatalog(runtime),
+    ))
+  )
+    return;
   void steps.startDeferredVoiceWarmup(runtime);
 
   // Completion is stamped inside the liveness guard so a superseded tail
