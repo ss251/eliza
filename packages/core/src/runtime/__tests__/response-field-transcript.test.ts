@@ -275,3 +275,124 @@ describe("parseMessageHandlerOutput — text-mode transcript path (#11712)", () 
 		expect(parseMessageHandlerOutput("just a normal reply")).toBeNull();
 	});
 });
+
+describe("response field transcript — parser edge branches", () => {
+	it("drops preamble lines that precede the first field marker", () => {
+		const parsed = parseFieldTranscript(
+			"unrelated chatter\nmore chatter\nreplyText: after the preamble",
+		);
+		expect(parsed?.fields.replyText).toBe("after the preamble");
+		expect(parsed?.fieldCount).toBe(1);
+	});
+
+	it("is case-sensitive on field names (a capitalized near-miss stays preamble)", () => {
+		const parsed = parseFieldTranscript(
+			"ShouldRespond: RESPOND\nreplyText: case check",
+		);
+		expect(parsed?.fields.shouldRespond).toBeUndefined();
+		expect(parsed?.fields.replyText).toBe("case check");
+	});
+
+	it("counts distinct known fields after de-duplication", () => {
+		expect(parseFieldTranscript(LEAKED_TRANSCRIPT)?.fieldCount).toBe(5);
+		const duplicated = parseFieldTranscript(
+			"replyText: first\n\nreplyText: second",
+		);
+		expect(duplicated?.fieldCount).toBe(1);
+	});
+
+	it("keeps an empty inline value as an empty string rather than dropping the field", () => {
+		const parsed = parseFieldTranscript("contexts:\ntopics: ");
+		expect(parsed?.fields.contexts).toBe("");
+		expect(parsed?.fields.topics).toBe("");
+		expect(parsed?.fieldCount).toBe(2);
+	});
+
+	it("normalizes CRLF line endings before segmenting", () => {
+		const parsed = parseFieldTranscript(
+			"shouldRespond: RESPOND\r\n\r\nreplyText: crlf reply\r\n\r\ncontexts: simple",
+		);
+		expect(parsed?.fields.shouldRespond).toBe("RESPOND");
+		expect(parsed?.fields.replyText).toBe("crlf reply");
+		expect(parsed?.fields.contexts).toBe("simple");
+	});
+
+	it("absorbs unknown keyed lines into the current field value", () => {
+		const parsed = parseFieldTranscript("replyText: one\nnote: two");
+		expect(parsed?.fields.replyText).toBe("one\nnote: two");
+		expect(parsed?.fields.note).toBeUndefined();
+	});
+
+	it("opens fields from lines indented up to three spaces but treats deeper indents as content", () => {
+		expect(
+			parseFieldTranscript("   replyText: indented opener")?.fields.replyText,
+		).toBe("indented opener");
+		expect(parseFieldTranscript("    replyText: four-space indent")).toBeNull();
+	});
+
+	it("treats tilde-fenced field lines as quoted content, never boundaries", () => {
+		const t = `replyText: diagnosing below
+
+~~~
+contexts: simple
+replyText: quoted
+~~~
+
+still part of the value`;
+		const parsed = parseFieldTranscript(t);
+		expect(parsed?.fields.replyText).toContain("contexts: simple");
+		expect(parsed?.fields.replyText).toContain("still part of the value");
+		expect(parsed?.fields.contexts).toBeUndefined();
+	});
+});
+
+describe("response field transcript — guard edge branches", () => {
+	it("does not flag a transcript-shaped echo whose hallmark never appears", () => {
+		expect(
+			looksLikeRawFieldTranscript(
+				"contexts: simple\ntopics: aurora\nemotion: none",
+			),
+		).toBe(false);
+	});
+
+	it("rejects non-string inputs outright", () => {
+		expect(looksLikeRawFieldTranscript(undefined)).toBe(false);
+		expect(looksLikeRawFieldTranscript(42)).toBe(false);
+		expect(looksLikeRawFieldTranscript({ shouldRespond: "RESPOND" })).toBe(
+			false,
+		);
+	});
+
+	it("recognizes a CRLF-terminated leak", () => {
+		expect(
+			looksLikeRawFieldTranscript(
+				"shouldRespond: RESPOND\r\nreplyText: crlf leak",
+			),
+		).toBe(true);
+	});
+
+	it("honors tilde fences as quoted content", () => {
+		expect(
+			looksLikeRawFieldTranscript(
+				"~~~\nshouldRespond: RESPOND\nreplyText: hi\n~~~\nthat's the leak.",
+			),
+		).toBe(false);
+	});
+});
+
+describe("response field transcript — list splitter edge branches", () => {
+	it("collapses n/a, literal [] and case variants of none", () => {
+		expect(splitTranscriptList("n/a")).toEqual([]);
+		expect(splitTranscriptList("N/A")).toEqual([]);
+		expect(splitTranscriptList("[]")).toEqual([]);
+		expect(splitTranscriptList("NONE")).toEqual([]);
+	});
+
+	it("splits mixed commas and newlines, trimming items and dropping empties", () => {
+		expect(splitTranscriptList("alpha,\nbeta\n\n gamma ,,")).toEqual([
+			"alpha",
+			"beta",
+			"gamma",
+		]);
+	});
+});
