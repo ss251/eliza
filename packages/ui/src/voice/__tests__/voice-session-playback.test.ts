@@ -242,4 +242,183 @@ describe("voice-session streaming PCM playback sink (ScriptProcessor path)", () 
     expect(onDrained).toHaveBeenCalledTimes(1);
     await pb.stop();
   });
+
+  it("rejects an already-aborted signal without constructing a context", async () => {
+    const createAudioContext = vi.fn(() => new FakePlaybackAudioContext());
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(
+      createVoiceSessionPlayback({
+        createAudioContext,
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+
+    expect(createAudioContext).not.toHaveBeenCalled();
+  });
+
+  it("tears down automatically when the signal aborts after setup", async () => {
+    const ctx = new FakePlaybackAudioContext();
+    const controller = new AbortController();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+      signal: controller.signal,
+    });
+    await pb.unlock();
+    pb.enqueue(pcmFrame(0.5, 4));
+
+    controller.abort();
+    await vi.waitFor(() => expect(ctx.closed).toBe(true));
+
+    expect(pb.unlocked).toBe(false);
+    // A frame arriving after abort is ignored, not queued behind a dead graph.
+    pb.enqueue(pcmFrame(0.5, 4));
+    expect(pb.needsUnlock).toBe(false);
+  });
+
+  it("ignores frames enqueued after stop()", async () => {
+    const ctx = new FakePlaybackAudioContext();
+    const onUnlockChange = vi.fn();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+      onUnlockChange,
+    });
+    await pb.stop();
+
+    pb.enqueue(pcmFrame(0.5, 4));
+
+    expect(pb.needsUnlock).toBe(false);
+    expect(onUnlockChange).not.toHaveBeenCalled();
+  });
+
+  it("ignores an empty pcm frame while suspended instead of raising the unlock CTA", async () => {
+    const ctx = new FakePlaybackAudioContext();
+    const onUnlockChange = vi.fn();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+      onUnlockChange,
+    });
+
+    pb.enqueue(new Uint8Array(0));
+
+    expect(pb.needsUnlock).toBe(false);
+    expect(onUnlockChange).not.toHaveBeenCalled();
+
+    // Nothing was buffered: unlocking plays silence.
+    await pb.unlock();
+    const out = scriptNodeOf(ctx).render(4);
+    expect(out.every((v) => v === 0)).toBe(true);
+    await pb.stop();
+  });
+
+  it("falls back to ScriptProcessor when only the global AudioWorkletNode is missing", async () => {
+    vi.stubGlobal("AudioWorkletNode", undefined);
+    const ctx = new FakePlaybackWorkletAudioContext();
+
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+    });
+
+    expect(pb.backend).toBe("scriptprocessor");
+    // The context offered a worklet but no node constructor existed globally,
+    // so addModule must never have been awaited.
+    expect(ctx.moduleUrls).toEqual([]);
+    await pb.stop();
+  });
+
+  it("falls back to ScriptProcessor when the context lacks audioWorklet despite a global AudioWorkletNode", async () => {
+    vi.stubGlobal("AudioWorkletNode", FakeVoiceAudioWorkletNode);
+    const ctx = new FakePlaybackAudioContext();
+
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+    });
+
+    expect(pb.backend).toBe("scriptprocessor");
+    expect(FakeVoiceAudioWorkletNode.instances).toHaveLength(0);
+    await pb.stop();
+  });
+
+  it("forwards drained notifications from the AudioWorklet port to onDrained", async () => {
+    vi.stubGlobal("AudioWorkletNode", FakeVoiceAudioWorkletNode);
+    const onDrained = vi.fn();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => new FakePlaybackWorkletAudioContext(),
+      onDrained,
+    });
+    const node = FakeVoiceAudioWorkletNode.instances[0];
+    if (!node) throw new Error("no worklet node constructed");
+
+    node.port.onmessage?.({ data: { type: "unrelated" } });
+    expect(onDrained).not.toHaveBeenCalled();
+
+    node.port.onmessage?.({ data: { type: "drained" } });
+    expect(onDrained).toHaveBeenCalledTimes(1);
+    await pb.stop();
+  });
+
+  it("posts queued pcm frames and flush commands to the AudioWorklet port while running", async () => {
+    vi.stubGlobal("AudioWorkletNode", FakeVoiceAudioWorkletNode);
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => new FakePlaybackWorkletAudioContext(),
+    });
+    await pb.unlock();
+
+    pb.enqueue(pcmFrame(0.5, 2));
+    const posted = FakeVoiceAudioWorkletNode.instances[0]?.postedMessages[0] as
+      | { type?: string; pcm?: Float32Array }
+      | undefined;
+    expect(posted?.type).toBe("pcm");
+    expect(posted?.pcm?.length).toBe(2);
+    expect(posted?.pcm?.[0]).toBeCloseTo(0.5, 2);
+
+    pb.flush();
+    expect(FakeVoiceAudioWorkletNode.instances[0]?.postedMessages[1]).toEqual({
+      type: "flush",
+    });
+    await pb.stop();
+  });
+
+  it("keeps playback working when the onUnlockChange observer throws", async () => {
+    const ctx = new FakePlaybackAudioContext();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+      onUnlockChange: () => {
+        throw new Error("observer exploded");
+      },
+    });
+
+    // Buffering must survive the throwing CTA observer.
+    pb.enqueue(pcmFrame(0.5, 4));
+    expect(pb.needsUnlock).toBe(true);
+
+    await pb.unlock();
+    const out = scriptNodeOf(ctx).render(4);
+    for (let i = 0; i < 4; i += 1) expect(out[i]).toBeCloseTo(0.5, 2);
+
+    // stop() also flips needsUnlock through the same guarded notification.
+    await pb.stop();
+    expect(ctx.closed).toBe(true);
+  });
+
+  it("closes the context exactly once across repeated stop() calls", async () => {
+    class CountedCloseContext extends FakePlaybackAudioContext {
+      closeCalls = 0;
+      override async close(): Promise<void> {
+        this.closeCalls += 1;
+        await super.close();
+      }
+    }
+    const ctx = new CountedCloseContext();
+    const pb = await createVoiceSessionPlayback({
+      createAudioContext: () => ctx,
+    });
+
+    await pb.stop();
+    await pb.stop();
+
+    expect(ctx.closed).toBe(true);
+    expect(ctx.closeCalls).toBe(1);
+  });
 });
