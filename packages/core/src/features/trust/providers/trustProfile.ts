@@ -53,11 +53,11 @@ export const trustProfileProvider: Provider = {
 				},
 			);
 
+			// Model-facing trust context must include the complete retained history.
 			const recentInteractions = await trustEngine.getRecentInteractions(
 				message.entityId,
-				7,
+				Number.POSITIVE_INFINITY,
 			);
-			const visibleRecentInteractions = recentInteractions;
 
 			const trustLevel =
 				senderProfile.overallTrust >= 80
@@ -98,7 +98,7 @@ export const trustProfileProvider: Provider = {
 				},
 				data: {
 					profile: senderProfile,
-					recentInteractions: visibleRecentInteractions,
+					recentInteractions,
 					truncated: false,
 				},
 			};

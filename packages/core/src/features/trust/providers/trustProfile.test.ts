@@ -24,6 +24,7 @@ const AGENT_ID = "00000000-0000-0000-0000-000000000001" as UUID;
 const ENTITY_ID = "00000000-0000-0000-0000-000000000002" as UUID;
 const ROOM_ID = "00000000-0000-0000-0000-000000000003" as UUID;
 const OTHER_ID = "00000000-0000-0000-0000-000000000004" as UUID;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const message: Memory = {
 	agentId: AGENT_ID,
@@ -58,12 +59,12 @@ function profile(
 	};
 }
 
-function interaction(impact: number): TrustInteraction {
+function interaction(impact: number, timestamp = 1): TrustInteraction {
 	return {
 		sourceEntityId: ENTITY_ID,
 		targetEntityId: OTHER_ID,
 		type: TrustEvidenceType.HELPFUL_ACTION,
-		timestamp: 1,
+		timestamp,
 		impact,
 	};
 }
@@ -77,7 +78,14 @@ function runtimeWithService(options?: {
 		if (options && "failure" in options) throw options.failure;
 		return options?.profile ?? profile(80);
 	});
-	const getRecentInteractions = vi.fn(async () => options?.interactions ?? []);
+	const getRecentInteractions = vi.fn(
+		async (_entityId: UUID, daysBack = 10) => {
+			const cutoff = Date.now() - daysBack * DAY_MS;
+			return (options?.interactions ?? []).filter(
+				(candidate) => candidate.timestamp > cutoff,
+			);
+		},
+	);
 	const service = {
 		trustEngine: { evaluateTrust },
 		getRecentInteractions,
@@ -173,7 +181,35 @@ describe("trustProfileProvider", () => {
 		expect(evaluateTrust).toHaveBeenCalledWith(ENTITY_ID, AGENT_ID, {
 			roomId: ROOM_ID,
 		});
-		expect(getRecentInteractions).toHaveBeenCalledWith(ENTITY_ID, 7);
+		expect(getRecentInteractions).toHaveBeenCalledWith(
+			ENTITY_ID,
+			Number.POSITIVE_INFINITY,
+		);
+	});
+
+	test("returns all interaction evidence beyond the seven-day window", async () => {
+		const now = Date.now();
+		const interactions = Array.from({ length: 9 }, (_, index) =>
+			interaction(index % 2 === 0 ? 2 : -2, now - index * DAY_MS),
+		);
+		const { runtime, getRecentInteractions } = runtimeWithService({
+			interactions,
+		});
+
+		const result = await trustProfileProvider.get(runtime, message, state);
+
+		expect(result.data).toMatchObject({
+			recentInteractions: interactions,
+			truncated: false,
+		});
+		expect(result.values).toMatchObject({
+			recentPositiveActions: 5,
+			recentNegativeActions: 4,
+		});
+		expect(getRecentInteractions).toHaveBeenCalledWith(
+			ENTITY_ID,
+			Number.POSITIVE_INFINITY,
+		);
 	});
 
 	test.each([
