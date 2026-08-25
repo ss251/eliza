@@ -1,8 +1,9 @@
 /**
  * Exercises the opt-in `processBatch` path on BatchQueue that lets the
  * embedding-drain embed N texts in one request. Per-item callers (no
- * `processBatch`) are unaffected; with it set, a drain calls it ONCE and only
- * falls back to the per-item `process` if the batched call throws.
+ * `processBatch`) are unaffected; with it set, a drain calls it ONCE and sends
+ * failed outcomes through the same per-item retry and exhaustion path used by
+ * a batch-wide throw.
  */
 
 import { describe, expect, test } from "vitest";
@@ -66,6 +67,56 @@ describe("BatchQueue processBatch", () => {
 
 		// processBatch threw -> every item was processed individually (retry path).
 		expect(perItem.sort()).toEqual([1, 2]);
+	});
+
+	test("failed batch outcomes retry per-item and report exhaustion", async () => {
+		const perItem: number[] = [];
+		const exhausted: number[] = [];
+		const outcomesSeen: { item: number; success: boolean }[][] = [];
+		const q = new BatchQueue<number>({
+			name: "TEST_DRAIN",
+			batchSize: 10,
+			drainIntervalMs: 100,
+			getPriority: () => "normal",
+			maxParallel: 1,
+			maxRetriesAfterFailure: 1,
+			retryPolicy: { minDelayMs: 0, maxDelayMs: 0 },
+			process: async (item) => {
+				perItem.push(item);
+				if (item === 3) {
+					throw new Error("still unavailable");
+				}
+			},
+			processBatch: async (items) =>
+				items.map((item) => ({
+					item,
+					success: item === 1,
+					error: item === 1 ? undefined : new Error("batch write failed"),
+					retryCount: 0,
+				})),
+			onExhausted: (item) => {
+				exhausted.push(item);
+			},
+			onDrainBatchOutcomes: (outcomes) => {
+				outcomesSeen.push(outcomes);
+			},
+		});
+
+		q.enqueue(1);
+		q.enqueue(2);
+		q.enqueue(3);
+		await q.drain();
+
+		expect(perItem).toEqual([2, 3, 3]);
+		expect(exhausted).toEqual([3]);
+		expect(outcomesSeen).toHaveLength(1);
+		expect(
+			outcomesSeen[0]?.map(({ item, success }) => ({ item, success })),
+		).toEqual([
+			{ item: 1, success: true },
+			{ item: 2, success: true },
+			{ item: 3, success: false },
+		]);
 	});
 
 	test("without processBatch, behavior is unchanged (per-item only)", async () => {
