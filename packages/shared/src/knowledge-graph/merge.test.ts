@@ -191,6 +191,29 @@ describe("foldIdentity", () => {
 });
 
 describe("mergeEntities", () => {
+  it.each(["constructor", "__proto__"])(
+    "stores the open attribute key %s as an own property",
+    (key) => {
+      const source = entity("source", []);
+      const attribute = {
+        value: "builder",
+        confidence: 0.9,
+        evidence: ["source-observation"],
+        updatedAt: "2026-02-01",
+      };
+      source.attributes = Object.fromEntries([[key, attribute]]);
+
+      const merged = mergeEntities({
+        target: entity("target", []),
+        sources: [source],
+        now: "2026-03-01",
+      });
+
+      expect(Object.hasOwn(merged.attributes ?? {}, key)).toBe(true);
+      expect(merged.attributes?.[key]).toEqual(attribute);
+    },
+  );
+
   it.each([
     {
       label: "source confidence is higher",

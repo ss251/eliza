@@ -202,9 +202,16 @@ export function mergeEntities(args: {
       tags.add(tag);
     }
     for (const [key, attr] of Object.entries(source.attributes ?? {})) {
-      const existing = attributes[key];
+      const existing = Object.hasOwn(attributes, key)
+        ? attributes[key]
+        : undefined;
       if (!existing) {
-        attributes[key] = attr;
+        Object.defineProperty(attributes, key, {
+          value: attr,
+          enumerable: true,
+          configurable: true,
+          writable: true,
+        });
       } else {
         const chosen = attr.confidence > existing.confidence ? attr : existing;
         attributes[key] = {
