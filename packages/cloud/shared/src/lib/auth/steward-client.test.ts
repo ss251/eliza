@@ -16,6 +16,7 @@ const ENV = { STEWARD_JWT_SECRET: SECRET };
 const memoryCache = new Map<string, unknown>();
 let distributedCacheValue: unknown = null;
 let tokenSequence = 0;
+const cacheDel = mock(async (_key: string) => undefined);
 
 mock.module("../../db/helpers", () => ({
   dbRead: {},
@@ -29,7 +30,7 @@ mock.module("../cache/client", () => ({
   cache: {
     get: async () => distributedCacheValue,
     set: async () => undefined,
-    del: async () => undefined,
+    del: cacheDel,
   },
 }));
 
@@ -55,8 +56,12 @@ mock.module("../utils/logger", () => ({
   redact: { id: (v: string) => v, orgId: (v: string) => v, userId: (v: string) => v },
 }));
 
-const { mintStewardTokenFromClaims, STEWARD_ACCESS_TOKEN_TTL_SECONDS, verifyStewardTokenCached } =
-  await import("./steward-client");
+const {
+  invalidateStewardTokenCache,
+  mintStewardTokenFromClaims,
+  STEWARD_ACCESS_TOKEN_TTL_SECONDS,
+  verifyStewardTokenCached,
+} = await import("./steward-client");
 
 function secretKey(): Uint8Array {
   return new TextEncoder().encode(SECRET);
@@ -77,6 +82,20 @@ async function mint(claims: Record<string, unknown> = {}): Promise<string> {
 async function verify(token: string) {
   return await verifyStewardTokenCached(ENV, token);
 }
+
+describe("invalidateStewardTokenCache", () => {
+  test("deletes the canonical full-digest user-session projection", async () => {
+    const token = "verified-session-token";
+    const fullHash = createHash("sha256").update(token).digest("hex");
+    const truncatedHash = fullHash.substring(0, 32);
+
+    cacheDel.mockClear();
+    await invalidateStewardTokenCache(token);
+
+    expect(cacheDel).toHaveBeenCalledWith(`session:steward:${truncatedHash}:v1`);
+    expect(cacheDel).toHaveBeenCalledWith(`session:user:${fullHash}:v1`);
+  });
+});
 
 describe("verifyStewardTokenCached — token lifecycle claims", () => {
   beforeEach(() => {
