@@ -213,6 +213,41 @@ Point `OPENAI_BASE_URL` at a Cerebras endpoint or set `ELIZA_PROVIDER=cerebras` 
 
 Set `EVOLINK_API_KEY` to use EvoLink through its OpenAI-compatible endpoint. The plugin defaults to `https://direct.evolink.ai/v1` and `gpt-5.2`; set `EVOLINK_BASE_URL` or `EVOLINK_MODEL` to override either value.
 
+## PZERO compatibility
+
+PZERO provides prepaid, privacy-first inference through the plugin's existing
+OpenAI-compatible endpoint support; no separate PZERO plugin is required.
+
+```bash
+elizaos plugins add @elizaos/plugin-openai
+
+export OPENAI_API_KEY=pzero_YOUR_KEY
+export OPENAI_BASE_URL=https://api.pzero.studio/v1
+export OPENAI_SMALL_MODEL=deepseek-v4-flash
+export OPENAI_LARGE_MODEL=deepseek-v4-flash
+```
+
+`OPENAI_BASE_URL` must be the `/v1` root, not `/v1/chat/completions`. Use PZERO
+catalog model IDs as-is. Do not point `OPENAI_EMBEDDING_URL` at PZERO unless you
+have verified embedding support separately; keep embeddings on a host that
+serves them, or skip embedding features.
+
+[Get a PZERO key](https://pzero.studio/agents) after signing in for free. PZERO
+has no starter credits; usage is paid, the minimum top-up is 1 USDC on Base,
+and every AI Credit is at least 20% off the $1 list price. The default landing
+model is `deepseek-v4-flash`. Query the public live text-model catalog with
+`GET https://api.pzero.studio/v1/models`.
+
+To smoke-test the same host that the plugin calls, set `PZERO_API_KEY` to the
+same key and run:
+
+```bash
+curl -sS -X POST "https://api.pzero.studio/v1/chat/completions" \
+  -H "Authorization: Bearer $PZERO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"deepseek-v4-flash","messages":[{"role":"user","content":"Hello from PZERO"}],"stream":false}'
+```
+
 ## Prompt caching
 
 Pass `providerOptions.openai.promptCacheKey` and `promptCacheRetention` on any `GenerateTextParams` call to enable OpenAI prompt caching:
