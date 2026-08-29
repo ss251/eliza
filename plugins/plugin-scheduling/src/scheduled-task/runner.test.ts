@@ -40,8 +40,10 @@ import {
   registerBuiltInGates,
 } from "./gate-registry.js";
 import {
+  ChannelKeyError,
   createInMemoryScheduledTaskStore,
   createScheduledTaskRunner,
+  type ScheduledTaskRunnerDeps,
   type ScheduledTaskRunnerHandle,
   TestNoopScheduledTaskDispatcher,
 } from "./runner.js";
@@ -72,6 +74,7 @@ interface Harness {
   setPause(view: { active: boolean; reason?: string }): void;
   setActivity(bus: ActivitySignalBusView): void;
   setSubjectStore(store: SubjectStoreView): void;
+  nextFireAt(taskId: string): string | null | undefined;
 }
 
 function makeHarness(initialIso = "2026-05-09T12:00:00.000Z"): Harness {
@@ -99,7 +102,15 @@ function makeHarness(initialIso = "2026-05-09T12:00:00.000Z"): Harness {
 
   const anchors = createAnchorRegistry();
   const consolidation = createConsolidationRegistry();
-  const store = createInMemoryScheduledTaskStore();
+  const baseStore = createInMemoryScheduledTaskStore();
+  const nextFireAtByTaskId = new Map<string, string | null>();
+  const store: ScheduledTaskRunnerDeps["store"] = {
+    ...baseStore,
+    async upsert(task, options) {
+      nextFireAtByTaskId.set(task.taskId, options?.nextFireAtIso ?? null);
+      await baseStore.upsert(task, options);
+    },
+  };
   const logStore = createInMemoryScheduledTaskLogStore();
 
   let counter = 0;
@@ -119,6 +130,8 @@ function makeHarness(initialIso = "2026-05-09T12:00:00.000Z"): Harness {
       wasUpdatedSince: (...a) => subjectStore.wasUpdatedSince(...a),
     },
     dispatcher: TestNoopScheduledTaskDispatcher,
+    channelKeys: () =>
+      new Set(["discord", "imessage", "in_app", "push", "telegram"]),
     newTaskId: () => {
       counter += 1;
       return `task_${counter}`;
@@ -144,6 +157,7 @@ function makeHarness(initialIso = "2026-05-09T12:00:00.000Z"): Harness {
     setSubjectStore: (s) => {
       subjectStore = s;
     },
+    nextFireAt: (taskId) => nextFireAtByTaskId.get(taskId),
   };
 }
 
@@ -650,14 +664,72 @@ describe("ScheduledTaskRunner — every verb", () => {
     const edited = await h.runner.apply(task.taskId, "edit", {
       priority: "high",
       promptInstructions: "updated text",
+      trigger: { kind: "interval", everyMinutes: 30 },
     });
     expect(edited.priority).toBe("high");
     expect(edited.promptInstructions).toBe("updated text");
+    expect(edited.trigger).toEqual({ kind: "interval", everyMinutes: 30 });
+    expect(h.nextFireAt(task.taskId)).toBe("2026-05-09T12:00:00.000Z");
     await expect(
       h.runner.apply(task.taskId, "edit", {
         state: { status: "completed", followupCount: 0 },
       } as unknown as Parameters<ScheduledTaskRunnerHandle["apply"]>[2]),
     ).rejects.toThrow(/read-only/);
+  });
+
+  it.each([
+    [
+      "invalid interval trigger",
+      { trigger: { kind: "interval", everyMinutes: -5 } },
+    ],
+    [
+      "invalid once trigger",
+      { trigger: { kind: "once", atIso: "not-an-iso-date" } },
+    ],
+    ["invalid task kind", { kind: "definitely-not-a-task-kind" }],
+    ["invalid priority", { priority: "critical" }],
+  ])(
+    "edit rejects %s without changing the stored task",
+    async (_label, patch) => {
+      const h = makeHarness();
+      const task = await h.runner.schedule(
+        baseInput({ trigger: { kind: "interval", everyMinutes: 60 } }),
+      );
+
+      await expect(
+        h.runner.apply(
+          task.taskId,
+          "edit",
+          patch as unknown as Parameters<ScheduledTaskRunnerHandle["apply"]>[2],
+        ),
+      ).rejects.toBeInstanceOf(ScheduledTaskValidationError);
+      expect(
+        (await h.runner.list()).find((item) => item.taskId === task.taskId),
+      ).toEqual(task);
+    },
+  );
+
+  it("edit rejects unknown escalation channels and accepts registered channels", async () => {
+    const h = makeHarness();
+    const task = await h.runner.schedule(baseInput());
+
+    await expect(
+      h.runner.apply(task.taskId, "edit", {
+        escalation: {
+          steps: [{ channelKey: "definitely-not-registered", delayMinutes: 5 }],
+        },
+      }),
+    ).rejects.toBeInstanceOf(ChannelKeyError);
+    expect(
+      (await h.runner.list()).find((item) => item.taskId === task.taskId),
+    ).toEqual(task);
+
+    const edited = await h.runner.apply(task.taskId, "edit", {
+      escalation: {
+        steps: [{ channelKey: "in_app", delayMinutes: 5 }],
+      },
+    });
+    expect(edited.escalation?.steps?.[0]?.channelKey).toBe("in_app");
   });
 
   it("edit refuses an own __proto__ key instead of re-parenting the task", async () => {

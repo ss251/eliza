@@ -1432,6 +1432,25 @@ export function createScheduledTaskRunner(
         throw new Error(`edit: ${key} is read-only`);
       }
     }
+
+    const edited = Object.assign(structuredClone(task), payload);
+    const input = stripServerManaged(edited);
+    const validationIssues = validateScheduledTaskInput(input, deps);
+    if (validationIssues.length > 0) {
+      throw new ScheduledTaskValidationError(validationIssues);
+    }
+    if (deps.channelKeys && input.escalation?.steps) {
+      const registered = deps.channelKeys();
+      for (const step of input.escalation.steps) {
+        if (!registered.has(step.channelKey)) {
+          throw new ChannelKeyError(
+            step.channelKey,
+            Array.from(registered).sort(),
+          );
+        }
+      }
+    }
+
     Object.assign(task, payload);
     await persist(task);
     await logger.log(task.taskId, "edited", {
